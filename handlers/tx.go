@@ -8,10 +8,10 @@ import (
 	sessiontypes "github.com/sentinel-official/hub/x/session/types"
 	subscriptiontypes "github.com/sentinel-official/hub/x/subscription/types"
 
-	"github.com/sentinel-official/api-client/context"
-	"github.com/sentinel-official/api-client/requests"
-	"github.com/sentinel-official/api-client/types"
-	"github.com/sentinel-official/api-client/utils"
+	"github.com/solarlabsteam/sentinel-api-backend/context"
+	"github.com/solarlabsteam/sentinel-api-backend/requests"
+	"github.com/solarlabsteam/sentinel-api-backend/types"
+	"github.com/solarlabsteam/sentinel-api-backend/utils"
 )
 
 func HandlerTxBankSend(ctx context.Context) gin.HandlerFunc {

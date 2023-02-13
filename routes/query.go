@@ -3,8 +3,8 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/sentinel-official/api-client/context"
-	"github.com/sentinel-official/api-client/handlers"
+	"github.com/solarlabsteam/sentinel-api-backend/context"
+	"github.com/solarlabsteam/sentinel-api-backend/handlers"
 )
 
 func RegisterQueryRoutes(router gin.IRouter, ctx context.Context) {

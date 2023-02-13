@@ -10,9 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 
-	apicontext "github.com/sentinel-official/api-client/context"
-	"github.com/sentinel-official/api-client/routes"
-	"github.com/sentinel-official/api-client/types"
+	apicontext "github.com/solarlabsteam/sentinel-api-backend/context"
+	"github.com/solarlabsteam/sentinel-api-backend/routes"
+	"github.com/solarlabsteam/sentinel-api-backend/types"
 )
 
 const (

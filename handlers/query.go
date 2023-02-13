@@ -6,9 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/sentinel-official/api-client/context"
-	"github.com/sentinel-official/api-client/requests"
-	"github.com/sentinel-official/api-client/types"
+	"github.com/solarlabsteam/sentinel-api-backend/context"
+	"github.com/solarlabsteam/sentinel-api-backend/requests"
+	"github.com/solarlabsteam/sentinel-api-backend/types"
 )
 
 func HandlerGetAccount(ctx context.Context) gin.HandlerFunc {
