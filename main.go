@@ -7,11 +7,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/sentinel-official/hub"
 	"github.com/spf13/cobra"
 
 	apicontext "github.com/sentinel-official/api-client/context"
 	"github.com/sentinel-official/api-client/routes"
+	"github.com/sentinel-official/api-client/types"
 )
 
 const (
@@ -24,7 +24,7 @@ func main() {
 		SilenceUsage: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			var (
-				encCfg = hub.MakeEncodingConfig()
+				encCfg = types.MakeEncodingConfig()
 				ctx    = client.Context{}.
 					WithCodec(encCfg.Marshaler).
 					WithInterfaceRegistry(encCfg.InterfaceRegistry).
