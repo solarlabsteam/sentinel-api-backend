@@ -30,7 +30,11 @@ func HandlerTxBankSend(ctx context.Context) gin.HandlerFunc {
 
 		message := banktypes.NewMsgSend(key.GetAddress(), req.ToAccAddress, req.Amount)
 
-		result, err := ctx.Tx(kr, key.GetName(), req.Query.Gas, req.Body.Memo, req.GasPrices, req.Query.ChainID, req.Query.RPCAddress, req.Query.BroadcastMode, message)
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
 			return
@@ -56,7 +60,11 @@ func HandlerTxSubscribeToNode(ctx context.Context) gin.HandlerFunc {
 
 		message := subscriptiontypes.NewMsgSubscribeToNodeRequest(key.GetAddress(), req.NodeAddress, req.Deposit)
 
-		result, err := ctx.Tx(kr, key.GetName(), req.Query.Gas, req.Body.Memo, req.GasPrices, req.Query.ChainID, req.Query.RPCAddress, req.Query.BroadcastMode, message)
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
 			return
@@ -82,7 +90,11 @@ func HandlerTxSubscribeToPlan(ctx context.Context) gin.HandlerFunc {
 
 		message := subscriptiontypes.NewMsgSubscribeToPlanRequest(key.GetAddress(), req.URI.ID, req.Body.Denom)
 
-		result, err := ctx.Tx(kr, key.GetName(), req.Query.Gas, req.Body.Memo, req.GasPrices, req.Query.ChainID, req.Query.RPCAddress, req.Query.BroadcastMode, message)
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
 			return
@@ -108,7 +120,11 @@ func HandlerTxStartSession(ctx context.Context) gin.HandlerFunc {
 
 		message := sessiontypes.NewMsgStartRequest(key.GetAddress(), req.URI.ID, req.NodeAddress)
 
-		result, err := ctx.Tx(kr, key.GetName(), req.Query.Gas, req.Body.Memo, req.GasPrices, req.Query.ChainID, req.Query.RPCAddress, req.Query.BroadcastMode, message)
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
 			return
