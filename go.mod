@@ -1,4 +1,4 @@
-module github.com/sentinel-official/api-client
+module github.com/solarlabsteam/sentinel-api-backend
 
 go 1.20
 
