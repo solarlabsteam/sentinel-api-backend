@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/gin-contrib/cors"
@@ -47,7 +48,7 @@ func main() {
 			routes.RegisterQueryRoutes(router, ctx)
 			routes.RegisterTxRoutes(router, ctx)
 
-			return http.ListenAndServe(":8080", engine)
+			return http.ListenAndServe(":"+os.Getenv("PORT"), engine)
 		},
 	}
 
