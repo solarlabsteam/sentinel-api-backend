@@ -45,6 +45,7 @@ func main() {
 			engine.Use(cors.Default())
 
 			router := engine.Group("/api/v1")
+			routes.RegisterKeyringRoutes(router, ctx)
 			routes.RegisterQueryRoutes(router, ctx)
 			routes.RegisterTxRoutes(router, ctx)
 
