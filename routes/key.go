@@ -7,6 +7,6 @@ import (
 	"github.com/solarlabsteam/sentinel-api-backend/handlers"
 )
 
-func RegisterKeyringRoutes(router gin.IRouter, ctx context.Context) {
-	router.POST("/signatures", handlers.HandlerGenerateSignature(ctx))
+func RegisterKeyRoutes(router gin.IRouter, ctx context.Context) {
+	router.POST("/nodes/:node_address/sessions/:id/keys", handlers.HandlerAddSessionKey(ctx))
 }

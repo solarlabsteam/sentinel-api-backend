@@ -7,10 +7,12 @@ require (
 	github.com/cosmos/ibc-go/v3 v3.4.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.1
+	github.com/go-kit/kit v0.12.0
 	github.com/hashicorp/go-uuid v1.0.1
 	github.com/sentinel-official/hub v0.10.1
 	github.com/spf13/cobra v1.6.0
 	github.com/tendermint/tendermint v0.34.23
+	golang.org/x/crypto v0.1.0
 )
 
 require (
@@ -40,7 +42,6 @@ require (
 	github.com/dvsekhvalnov/jose2go v1.5.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/go-kit/kit v0.12.0 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
@@ -105,7 +106,6 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/zondax/hid v0.9.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
-	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
 	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/sys v0.1.0 // indirect
