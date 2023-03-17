@@ -224,6 +224,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 		if nodeType == 1 {
 			result.PrivateKey = wgPrivateKey.String()
 		} else if nodeType == 2 {
+			uid, _ := uuid.FormatUUID(uid)
 			result.UID = uid
 		}
 
