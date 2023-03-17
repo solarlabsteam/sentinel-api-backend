@@ -217,10 +217,14 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 		}
 
 		result := &responses.ResponseAddSessionKey{
-			NodeType:   nodeType,
-			UID:        uid,
-			PrivateKey: wgPrivateKey.String(),
-			Result:     body.Result.(string),
+			NodeType: nodeType,
+			Result:   body.Result.(string),
+		}
+
+		if nodeType == 1 {
+			result.PrivateKey = wgPrivateKey.String()
+		} else if nodeType == 2 {
+			result.UID = uid
 		}
 
 		c.JSON(http.StatusOK, types.NewResponseResult(result))
