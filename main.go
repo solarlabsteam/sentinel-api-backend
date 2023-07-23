@@ -25,9 +25,9 @@ func main() {
 		SilenceUsage: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			var (
-				encCfg = types.MakeEncodingConfig()
+				encCfg = types.DefaultEncodingConfig()
 				ctx    = client.Context{}.
-					WithCodec(encCfg.Marshaler).
+					WithCodec(encCfg.Codec).
 					WithInterfaceRegistry(encCfg.InterfaceRegistry).
 					WithTxConfig(encCfg.TxConfig).
 					WithLegacyAmino(encCfg.Amino)
