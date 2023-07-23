@@ -21,10 +21,10 @@ func RegisterQueryRoutes(router gin.IRouter, ctx context.Context) {
 
 	router.GET("/plans", handlers.HandlerGetPlans(ctx))
 	router.GET("/plans/:id", handlers.HandlerGetPlan(ctx))
+	router.GET("/plans/:id/nodes", handlers.HandlerGetNodesForPlan(ctx))
 
 	router.GET("/providers", handlers.HandlerGetProviders(ctx))
 	router.GET("/providers/:prov_address", handlers.HandlerGetProvider(ctx))
-	router.GET("/providers/:prov_address/nodes", handlers.HandlerGetNodesForProvider(ctx))
 	router.GET("/providers/:prov_address/plans", handlers.HandlerGetPlansForProvider(ctx))
 
 	router.GET("/sessions", handlers.HandlerGetSessions(ctx))
@@ -32,6 +32,6 @@ func RegisterQueryRoutes(router gin.IRouter, ctx context.Context) {
 
 	router.GET("/subscriptions", handlers.HandlerGetSubscriptions(ctx))
 	router.GET("/subscriptions/:id", handlers.HandlerGetSubscription(ctx))
-	router.GET("/subscriptions/:id/quotas", handlers.HandlerGetQuotasForSubscription(ctx))
-	router.GET("/subscriptions/:id/quotas/:acc_address", handlers.HandlerGetQuotaForSubscription(ctx))
+	router.GET("/subscriptions/:id/allocations", handlers.HandlerGetAllocationsForSubscription(ctx))
+	router.GET("/subscriptions/:id/allocations/:acc_address", handlers.HandlerGetAllocationForSubscription(ctx))
 }
