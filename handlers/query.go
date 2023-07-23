@@ -67,7 +67,7 @@ func HandlerGetSessionsForAccount(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		result, err := ctx.QuerySessionsForAddress(req.Query.RPCAddress, req.AccAddress, req.Status, req.Pagination)
+		result, err := ctx.QuerySessionsForAccount(req.Query.RPCAddress, req.AccAddress, req.Pagination)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
 			return
@@ -85,7 +85,7 @@ func HandlerGetSubscriptionsForAccount(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		result, err := ctx.QuerySubscriptionsForAddress(req.Query.RPCAddress, req.AccAddress, req.Status, req.Pagination)
+		result, err := ctx.QuerySubscriptionsForAccount(req.Query.RPCAddress, req.AccAddress, req.Pagination)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
 			return
@@ -211,7 +211,7 @@ func HandlerGetProviders(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		result, err := ctx.QueryProviders(req.Query.RPCAddress, req.Pagination)
+		result, err := ctx.QueryProviders(req.Query.RPCAddress, req.Status, req.Pagination)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
 			return
@@ -239,15 +239,15 @@ func HandlerGetProvider(ctx context.Context) gin.HandlerFunc {
 	}
 }
 
-func HandlerGetNodesForProvider(ctx context.Context) gin.HandlerFunc {
+func HandlerGetNodesForPlan(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		req, err := requests.NewRequestGetNodesForProvider(c)
+		req, err := requests.NewRequestGetNodesForPlan(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
 			return
 		}
 
-		result, err := ctx.QueryNodesForProvider(req.Query.RPCAddress, req.ProvAddress, req.Status, req.Pagination)
+		result, err := ctx.QueryNodesForPlan(req.Query.RPCAddress, req.URI.ID, req.Status, req.Pagination)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
 			return
@@ -347,15 +347,15 @@ func HandlerGetSubscription(ctx context.Context) gin.HandlerFunc {
 	}
 }
 
-func HandlerGetQuotasForSubscription(ctx context.Context) gin.HandlerFunc {
+func HandlerGetAllocationsForSubscription(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		req, err := requests.NewRequestGetQuotasForSubscription(c)
+		req, err := requests.NewRequestGetAllocationsForSubscription(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
 			return
 		}
 
-		result, err := ctx.QueryQuotas(req.Query.RPCAddress, req.URI.ID, req.Pagination)
+		result, err := ctx.QueryAllocations(req.Query.RPCAddress, req.URI.ID, req.Pagination)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
 			return
@@ -365,15 +365,15 @@ func HandlerGetQuotasForSubscription(ctx context.Context) gin.HandlerFunc {
 	}
 }
 
-func HandlerGetQuotaForSubscription(ctx context.Context) gin.HandlerFunc {
+func HandlerGetAllocationForSubscription(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		req, err := requests.NewRequestGetQuotaForSubscription(c)
+		req, err := requests.NewRequestGetAllocationForSubscription(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
 			return
 		}
 
-		result, err := ctx.QueryQuota(req.Query.RPCAddress, req.URI.ID, req.AccAddress)
+		result, err := ctx.QueryAllocation(req.Query.RPCAddress, req.URI.ID, req.AccAddress)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
 			return

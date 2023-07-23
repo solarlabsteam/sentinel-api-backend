@@ -87,7 +87,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 				messages,
 				sessiontypes.NewMsgEndRequest(
 					accAddress,
-					rSession.Id,
+					rSession.ID,
 					0,
 				),
 			)
@@ -160,7 +160,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		signature, _, err := kr.Sign(key.GetName(), sdk.Uint64ToBigEndian(rSession.Id))
+		signature, _, err := kr.Sign(key.GetName(), sdk.Uint64ToBigEndian(rSession.ID))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(10, err))
 			return
@@ -177,7 +177,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		endpoint, err := url.JoinPath(rNode.RemoteURL, fmt.Sprintf("/accounts/%s/sessions/%d", accAddress, rSession.Id))
+		endpoint, err := url.JoinPath(rNode.RemoteURL, fmt.Sprintf("/accounts/%s/sessions/%d", accAddress, rSession.ID))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(12, err))
 			return

@@ -5,8 +5,9 @@ import (
 
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/gin-gonic/gin"
+	nodetypes "github.com/sentinel-official/hub/x/node/types"
+	plantypes "github.com/sentinel-official/hub/x/plan/types"
 	sessiontypes "github.com/sentinel-official/hub/x/session/types"
-	subscriptiontypes "github.com/sentinel-official/hub/x/subscription/types"
 
 	"github.com/solarlabsteam/sentinel-api-backend/context"
 	"github.com/solarlabsteam/sentinel-api-backend/requests"
@@ -58,7 +59,7 @@ func HandlerTxSubscribeToNode(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := subscriptiontypes.NewMsgSubscribeToNodeRequest(key.GetAddress(), req.NodeAddress, req.Deposit)
+		message := nodetypes.NewMsgSubscribeRequest(key.GetAddress(), req.NodeAddress, req.Body.Gigabytes, req.Body.Hours, req.Body.Denom)
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
@@ -88,7 +89,7 @@ func HandlerTxSubscribeToPlan(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := subscriptiontypes.NewMsgSubscribeToPlanRequest(key.GetAddress(), req.URI.ID, req.Body.Denom)
+		message := plantypes.NewMsgSubscribeRequest(key.GetAddress(), req.URI.ID, req.Body.Denom)
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
