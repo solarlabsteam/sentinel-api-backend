@@ -408,9 +408,11 @@ func NewRequestGetPlan(c *gin.Context) (req *RequestGetPlan, err error) {
 
 type RequestGetProviders struct {
 	Pagination *query.PageRequest
+	Status     hubtypes.Status
 
 	Query struct {
 		RPCAddress string `form:"rpc_address" binding:"required"`
+		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
 		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
@@ -423,6 +425,11 @@ func NewRequestGetProviders(c *gin.Context) (req *RequestGetProviders, err error
 	req = &RequestGetProviders{}
 	if err = c.ShouldBindQuery(&req.Query); err != nil {
 		return nil, err
+	}
+
+	req.Status = hubtypes.StatusFromString(req.Query.Status)
+	if !req.Status.IsValid() {
+		return nil, fmt.Errorf("invalid query status")
 	}
 
 	var key []byte
@@ -472,13 +479,12 @@ func NewRequestGetProvider(c *gin.Context) (req *RequestGetProvider, err error) 
 	return req, nil
 }
 
-type RequestGetNodesForProvider struct {
-	ProvAddress hubtypes.ProvAddress
-	Status      hubtypes.Status
-	Pagination  *query.PageRequest
+type RequestGetNodesForPlan struct {
+	Status     hubtypes.Status
+	Pagination *query.PageRequest
 
 	URI struct {
-		ProvAddress string `uri:"prov_address"`
+		ID uint64 `uri:"id" binding:"gt=0"`
 	}
 	Query struct {
 		RPCAddress string `form:"rpc_address" binding:"required"`
@@ -491,8 +497,8 @@ type RequestGetNodesForProvider struct {
 	}
 }
 
-func NewRequestGetNodesForProvider(c *gin.Context) (req *RequestGetNodesForProvider, err error) {
-	req = &RequestGetNodesForProvider{}
+func NewRequestGetNodesForPlan(c *gin.Context) (req *RequestGetNodesForPlan, err error) {
+	req = &RequestGetNodesForPlan{}
 	if err = c.ShouldBindUri(&req.URI); err != nil {
 		return nil, err
 	}
@@ -500,10 +506,6 @@ func NewRequestGetNodesForProvider(c *gin.Context) (req *RequestGetNodesForProvi
 		return nil, err
 	}
 
-	req.ProvAddress, err = hubtypes.ProvAddressFromBech32(req.URI.ProvAddress)
-	if err != nil {
-		return nil, err
-	}
 	req.Status = hubtypes.StatusFromString(req.Query.Status)
 	if !req.Status.IsValid() {
 		return nil, fmt.Errorf("invalid query status")
@@ -716,7 +718,7 @@ func NewRequestGetSubscription(c *gin.Context) (req *RequestGetSubscription, err
 	return req, nil
 }
 
-type RequestGetQuotasForSubscription struct {
+type RequestGetAllocationsForSubscription struct {
 	Pagination *query.PageRequest
 
 	URI struct {
@@ -732,8 +734,8 @@ type RequestGetQuotasForSubscription struct {
 	}
 }
 
-func NewRequestGetQuotasForSubscription(c *gin.Context) (req *RequestGetQuotasForSubscription, err error) {
-	req = &RequestGetQuotasForSubscription{}
+func NewRequestGetAllocationsForSubscription(c *gin.Context) (req *RequestGetAllocationsForSubscription, err error) {
+	req = &RequestGetAllocationsForSubscription{}
 	if err = c.ShouldBindUri(&req.URI); err != nil {
 		return nil, err
 	}
@@ -760,7 +762,7 @@ func NewRequestGetQuotasForSubscription(c *gin.Context) (req *RequestGetQuotasFo
 	return req, nil
 }
 
-type RequestGetQuotaForSubscription struct {
+type RequestGetAllocationForSubscription struct {
 	AccAddress sdk.AccAddress
 
 	URI struct {
@@ -772,8 +774,8 @@ type RequestGetQuotaForSubscription struct {
 	}
 }
 
-func NewRequestGetQuotaForSubscription(c *gin.Context) (req *RequestGetQuotaForSubscription, err error) {
-	req = &RequestGetQuotaForSubscription{}
+func NewRequestGetAllocationForSubscription(c *gin.Context) (req *RequestGetAllocationForSubscription, err error) {
+	req = &RequestGetAllocationForSubscription{}
 	if err = c.ShouldBindUri(&req.URI); err != nil {
 		return nil, err
 	}

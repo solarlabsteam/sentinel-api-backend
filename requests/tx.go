@@ -82,7 +82,6 @@ type RequestTxSubscribeToNode struct {
 	FeeGranter  sdk.AccAddress
 	GasPrices   sdk.DecCoins
 	NodeAddress hubtypes.NodeAddress
-	Deposit     sdk.Coin
 
 	URI struct {
 		NodeAddress string `uri:"node_address"`
@@ -90,7 +89,9 @@ type RequestTxSubscribeToNode struct {
 	Query TxQuery
 	Body  struct {
 		TxBody
-		Deposit string `json:"deposit" binding:"required"`
+		Gigabytes int64  `json:"gigabytes" binding:"gigabytes"`
+		Hours     int64  `json:"hours" binding:"hours"`
+		Denom     string `json:"denom" binding:"denom"`
 	}
 }
 
@@ -119,11 +120,6 @@ func NewRequestTxSubscribeToNode(c *gin.Context) (req *RequestTxSubscribeToNode,
 	}
 
 	req.GasPrices, err = sdk.ParseDecCoins(req.Query.GasPrices)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Deposit, err = sdk.ParseCoinNormalized(req.Body.Deposit)
 	if err != nil {
 		return nil, err
 	}
