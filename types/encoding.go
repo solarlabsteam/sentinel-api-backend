@@ -26,10 +26,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
-	ibcica "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts"
-	ibctransfer "github.com/cosmos/ibc-go/v3/modules/apps/transfer"
-	ibc "github.com/cosmos/ibc-go/v3/modules/core"
-	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
 	custommint "github.com/sentinel-official/hub/x/mint"
 	"github.com/sentinel-official/hub/x/swap"
 	"github.com/sentinel-official/hub/x/vpn"
@@ -56,15 +52,10 @@ var (
 		genutil.AppModuleBasic{},
 		gov.NewAppModuleBasic(
 			distributionclient.ProposalHandler,
-			ibcclientclient.UpdateClientProposalHandler,
-			ibcclientclient.UpgradeProposalHandler,
 			paramsclient.ProposalHandler,
 			upgradeclient.ProposalHandler,
 			upgradeclient.CancelProposalHandler,
 		),
-		ibc.AppModuleBasic{},
-		ibcica.AppModuleBasic{},
-		ibctransfer.AppModuleBasic{},
 		mint.AppModuleBasic{},
 		params.AppModuleBasic{},
 		slashing.AppModuleBasic{},
