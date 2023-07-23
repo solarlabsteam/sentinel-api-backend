@@ -158,17 +158,17 @@ func (c Context) QueryNodes(rpcAddress string, status hubtypes.Status, paginatio
 	return resp.Nodes, nil
 }
 
-func (c Context) QueryNodesForProvider(rpcAddress string, provAddr hubtypes.ProvAddress, status hubtypes.Status, pagination *query.PageRequest) (result nodetypes.Nodes, err error) {
+func (c Context) QueryNodesForPlan(rpcAddress string, id uint64, status hubtypes.Status, pagination *query.PageRequest) (result nodetypes.Nodes, err error) {
 	c.Client, err = rpchttp.New(rpcAddress, "/websocket")
 	if err != nil {
 		return nil, err
 	}
 
 	qsc := nodetypes.NewQueryServiceClient(c)
-	resp, err := qsc.QueryNodesForProvider(
+	resp, err := qsc.QueryNodesForPlan(
 		context.Background(),
-		nodetypes.NewQueryNodesForProviderRequest(
-			provAddr,
+		nodetypes.NewQueryNodesForPlanRequest(
+			id,
 			status,
 			pagination,
 		),
@@ -268,7 +268,7 @@ func (c Context) QueryProvider(rpcAddress string, provAddr hubtypes.ProvAddress)
 	return &resp.Provider, nil
 }
 
-func (c Context) QueryProviders(rpcAddress string, pagination *query.PageRequest) (result providertypes.Providers, err error) {
+func (c Context) QueryProviders(rpcAddress string, status hubtypes.Status, pagination *query.PageRequest) (result providertypes.Providers, err error) {
 	c.Client, err = rpchttp.New(rpcAddress, "/websocket")
 	if err != nil {
 		return nil, err
@@ -278,6 +278,7 @@ func (c Context) QueryProviders(rpcAddress string, pagination *query.PageRequest
 	resp, err := qsc.QueryProviders(
 		context.Background(),
 		providertypes.NewQueryProvidersRequest(
+			status,
 			pagination,
 		),
 	)
@@ -331,18 +332,17 @@ func (c Context) QuerySessions(rpcAddress string, pagination *query.PageRequest)
 	return resp.Sessions, nil
 }
 
-func (c Context) QuerySessionsForAddress(rpcAddress string, accAddr sdk.AccAddress, status hubtypes.Status, pagination *query.PageRequest) (result sessiontypes.Sessions, err error) {
+func (c Context) QuerySessionsForAccount(rpcAddress string, accAddr sdk.AccAddress, pagination *query.PageRequest) (result sessiontypes.Sessions, err error) {
 	c.Client, err = rpchttp.New(rpcAddress, "/websocket")
 	if err != nil {
 		return nil, err
 	}
 
 	qsc := sessiontypes.NewQueryServiceClient(c)
-	resp, err := qsc.QuerySessionsForAddress(
+	resp, err := qsc.QuerySessionsForAccount(
 		context.Background(),
-		sessiontypes.NewQuerySessionsForAddressRequest(
+		sessiontypes.NewQuerySessionsForAccountRequest(
 			accAddr,
-			status,
 			pagination,
 		),
 	)
@@ -354,7 +354,7 @@ func (c Context) QuerySessionsForAddress(rpcAddress string, accAddr sdk.AccAddre
 	return resp.Sessions, nil
 }
 
-func (c Context) QuerySubscription(rpcAddress string, id uint64) (result *subscriptiontypes.Subscription, err error) {
+func (c Context) QuerySubscription(rpcAddress string, id uint64) (result subscriptiontypes.Subscription, err error) {
 	c.Client, err = rpchttp.New(rpcAddress, "/websocket")
 	if err != nil {
 		return nil, err
@@ -371,8 +371,11 @@ func (c Context) QuerySubscription(rpcAddress string, id uint64) (result *subscr
 	if err != nil {
 		return nil, err
 	}
+	if err = c.InterfaceRegistry.UnpackAny(resp.Subscription, &result); err != nil {
+		return nil, err
+	}
 
-	return &resp.Subscription, nil
+	return result, nil
 }
 
 func (c Context) QuerySubscriptions(rpcAddress string, pagination *query.PageRequest) (result subscriptiontypes.Subscriptions, err error) {
@@ -393,21 +396,29 @@ func (c Context) QuerySubscriptions(rpcAddress string, pagination *query.PageReq
 		return nil, err
 	}
 
-	return resp.Subscriptions, nil
+	for _, item := range resp.Subscriptions {
+		var v subscriptiontypes.Subscription
+		if err = c.InterfaceRegistry.UnpackAny(item, &v); err != nil {
+			return nil, err
+		}
+
+		result = append(result, v)
+	}
+
+	return result, nil
 }
 
-func (c Context) QuerySubscriptionsForAddress(rpcAddress string, accAddr sdk.AccAddress, status hubtypes.Status, pagination *query.PageRequest) (result subscriptiontypes.Subscriptions, err error) {
+func (c Context) QuerySubscriptionsForAccount(rpcAddress string, accAddr sdk.AccAddress, pagination *query.PageRequest) (result subscriptiontypes.Subscriptions, err error) {
 	c.Client, err = rpchttp.New(rpcAddress, "/websocket")
 	if err != nil {
 		return nil, err
 	}
 
 	qsc := subscriptiontypes.NewQueryServiceClient(c)
-	resp, err := qsc.QuerySubscriptionsForAddress(
+	resp, err := qsc.QuerySubscriptionsForAccount(
 		context.Background(),
-		subscriptiontypes.NewQuerySubscriptionsForAddressRequest(
+		subscriptiontypes.NewQuerySubscriptionsForAccountRequest(
 			accAddr,
-			status,
 			pagination,
 		),
 	)
@@ -416,19 +427,28 @@ func (c Context) QuerySubscriptionsForAddress(rpcAddress string, accAddr sdk.Acc
 		return nil, err
 	}
 
-	return resp.Subscriptions, nil
+	for _, item := range resp.Subscriptions {
+		var v subscriptiontypes.Subscription
+		if err = c.InterfaceRegistry.UnpackAny(item, &v); err != nil {
+			return nil, err
+		}
+
+		result = append(result, v)
+	}
+
+	return result, nil
 }
 
-func (c Context) QueryQuota(rpcAddress string, id uint64, accAddr sdk.AccAddress) (result *subscriptiontypes.Quota, err error) {
+func (c Context) QueryAllocation(rpcAddress string, id uint64, accAddr sdk.AccAddress) (result *subscriptiontypes.Allocation, err error) {
 	c.Client, err = rpchttp.New(rpcAddress, "/websocket")
 	if err != nil {
 		return nil, err
 	}
 
 	qsc := subscriptiontypes.NewQueryServiceClient(c)
-	resp, err := qsc.QueryQuota(
+	resp, err := qsc.QueryAllocation(
 		context.Background(),
-		subscriptiontypes.NewQueryQuotaRequest(
+		subscriptiontypes.NewQueryAllocationRequest(
 			id,
 			accAddr,
 		),
@@ -438,19 +458,19 @@ func (c Context) QueryQuota(rpcAddress string, id uint64, accAddr sdk.AccAddress
 		return nil, err
 	}
 
-	return &resp.Quota, nil
+	return &resp.Allocation, nil
 }
 
-func (c Context) QueryQuotas(rpcAddress string, id uint64, pagination *query.PageRequest) (result subscriptiontypes.Quotas, err error) {
+func (c Context) QueryAllocations(rpcAddress string, id uint64, pagination *query.PageRequest) (result subscriptiontypes.Allocations, err error) {
 	c.Client, err = rpchttp.New(rpcAddress, "/websocket")
 	if err != nil {
 		return nil, err
 	}
 
 	qsc := subscriptiontypes.NewQueryServiceClient(c)
-	resp, err := qsc.QueryQuotas(
+	resp, err := qsc.QueryAllocations(
 		context.Background(),
-		subscriptiontypes.NewQueryQuotasRequest(
+		subscriptiontypes.NewQueryAllocationsRequest(
 			id,
 			pagination,
 		),
@@ -460,7 +480,7 @@ func (c Context) QueryQuotas(rpcAddress string, id uint64, pagination *query.Pag
 		return nil, err
 	}
 
-	return resp.Quotas, nil
+	return resp.Allocations, nil
 }
 
 func (c Context) QueryActiveSession(rpcAddress string, accAddr sdk.AccAddress) (result *sessiontypes.Session, err error) {
@@ -470,13 +490,13 @@ func (c Context) QueryActiveSession(rpcAddress string, accAddr sdk.AccAddress) (
 	}
 
 	qsc := sessiontypes.NewQueryServiceClient(c)
-	resp, err := qsc.QuerySessionsForAddress(
+	resp, err := qsc.QuerySessionsForAccount(
 		context.Background(),
-		sessiontypes.NewQuerySessionsForAddressRequest(
+		sessiontypes.NewQuerySessionsForAccountRequest(
 			accAddr,
-			hubtypes.StatusActive,
 			&query.PageRequest{
-				Limit: 1,
+				Limit:   1,
+				Reverse: true,
 			},
 		),
 	)
@@ -487,6 +507,9 @@ func (c Context) QueryActiveSession(rpcAddress string, accAddr sdk.AccAddress) (
 	if len(resp.Sessions) == 0 {
 		return nil, nil
 	}
+	if resp.Sessions[0].Status.Equal(hubtypes.StatusActive) {
+		return &resp.Sessions[0], nil
+	}
 
-	return &resp.Sessions[0], nil
+	return nil, nil
 }
