@@ -8,6 +8,7 @@ import (
 	nodetypes "github.com/sentinel-official/hub/x/node/types"
 	plantypes "github.com/sentinel-official/hub/x/plan/types"
 	sessiontypes "github.com/sentinel-official/hub/x/session/types"
+	subscriptiontypes "github.com/sentinel-official/hub/x/subscription/types"
 
 	"github.com/solarlabsteam/sentinel-api-backend/context"
 	"github.com/solarlabsteam/sentinel-api-backend/requests"
@@ -90,6 +91,36 @@ func HandlerTxSubscribeToPlan(ctx context.Context) gin.HandlerFunc {
 		}
 
 		message := plantypes.NewMsgSubscribeRequest(key.GetAddress(), req.URI.ID, req.Body.Denom)
+
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(result))
+	}
+}
+
+func HandlerTxAllocate(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req, err := requests.NewRequestTxAllocate(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
+			return
+		}
+
+		kr, key, err := utils.NewInMemoryKey(req.Body.Mnemonic, req.Query.CoinType, req.Query.Account, req.Query.Index, req.Body.BIP39Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
+			return
+		}
+
+		message := subscriptiontypes.NewMsgAllocateRequest(key.GetAddress(), req.URI.ID, req.AccAddress, req.Bytes)
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,

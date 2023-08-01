@@ -168,6 +168,57 @@ func NewRequestTxSubscribeToPlan(c *gin.Context) (req *RequestTxSubscribeToPlan,
 	return req, err
 }
 
+type RequestTxAllocate struct {
+	FeeGranter sdk.AccAddress
+	GasPrices  sdk.DecCoins
+	AccAddress sdk.AccAddress
+	Bytes      sdk.Int
+
+	URI struct {
+		ID uint64 `uri:"id" binding:"gt=0"`
+	}
+	Query TxQuery
+	Body  struct {
+		TxBody
+		AccAddress string `json:"acc_address" binding:"required"`
+		Bytes      int64  `json:"bytes"`
+	}
+}
+
+func NewRequestTxAllocate(c *gin.Context) (req *RequestTxAllocate, err error) {
+	req = &RequestTxAllocate{}
+	if err = c.ShouldBindUri(&req.URI); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindQuery(&req.Query); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindJSON(&req.Body); err != nil {
+		return nil, err
+	}
+
+	if req.Body.FeeGranter != "" {
+		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.GasPrices, err = sdk.ParseDecCoins(req.Query.GasPrices)
+	if err != nil {
+		return nil, err
+	}
+
+	req.AccAddress, err = sdk.AccAddressFromBech32(req.Body.AccAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Bytes = sdk.NewInt(req.Body.Bytes)
+
+	return req, err
+}
+
 type RequestTxStartSession struct {
 	FeeGranter  sdk.AccAddress
 	GasPrices   sdk.DecCoins
