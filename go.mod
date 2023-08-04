@@ -8,7 +8,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-kit/kit v0.12.0
 	github.com/hashicorp/go-uuid v1.0.3
-	github.com/sentinel-official/hub v0.11.0-rc1
+	github.com/sentinel-official/hub v0.11.0-rc3
 	github.com/spf13/cobra v1.7.0
 	github.com/tendermint/tendermint v0.34.27
 	golang.org/x/crypto v0.11.0
