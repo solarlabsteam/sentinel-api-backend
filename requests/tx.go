@@ -89,9 +89,9 @@ type RequestTxSubscribeToNode struct {
 	Query TxQuery
 	Body  struct {
 		TxBody
-		Gigabytes int64  `json:"gigabytes" binding:"gigabytes"`
-		Hours     int64  `json:"hours" binding:"hours"`
-		Denom     string `json:"denom" binding:"denom"`
+		Gigabytes int64  `json:"gigabytes"`
+		Hours     int64  `json:"hours"`
+		Denom     string `json:"denom" binding:"required"`
 	}
 }
 
