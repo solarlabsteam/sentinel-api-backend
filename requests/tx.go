@@ -1,6 +1,8 @@
 package requests
 
 import (
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gin-gonic/gin"
 	hubtypes "github.com/sentinel-official/hub/types"
@@ -78,7 +80,7 @@ func NewRequestTxBankSend(c *gin.Context) (req *RequestTxBankSend, err error) {
 	return req, err
 }
 
-type RequestTxSubscribeToNode struct {
+type RequestTxNodeSubscribe struct {
 	FeeGranter  sdk.AccAddress
 	GasPrices   sdk.DecCoins
 	NodeAddress hubtypes.NodeAddress
@@ -95,8 +97,8 @@ type RequestTxSubscribeToNode struct {
 	}
 }
 
-func NewRequestTxSubscribeToNode(c *gin.Context) (req *RequestTxSubscribeToNode, err error) {
-	req = &RequestTxSubscribeToNode{}
+func NewRequestTxNodeSubscribe(c *gin.Context) (req *RequestTxNodeSubscribe, err error) {
+	req = &RequestTxNodeSubscribe{}
 	if err = c.ShouldBindUri(&req.URI); err != nil {
 		return nil, err
 	}
@@ -127,7 +129,188 @@ func NewRequestTxSubscribeToNode(c *gin.Context) (req *RequestTxSubscribeToNode,
 	return req, err
 }
 
-type RequestTxSubscribeToPlan struct {
+type RequestTxPlanCreate struct {
+	FeeGranter sdk.AccAddress
+	GasPrices  sdk.DecCoins
+	Prices     sdk.Coins
+
+	Query TxQuery
+	Body  struct {
+		TxBody
+		Duration  time.Duration `json:"duration" binding:"required"`
+		Gigabytes int64         `json:"gigabytes" binding:"required"`
+		Prices    string        `json:"prices" binding:"required"`
+	}
+}
+
+func NewRequestTxPlanCreate(c *gin.Context) (req *RequestTxPlanCreate, err error) {
+	req = &RequestTxPlanCreate{}
+	if err = c.ShouldBindQuery(&req.Query); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindJSON(&req.Body); err != nil {
+		return nil, err
+	}
+
+	if req.Body.FeeGranter != "" {
+		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.GasPrices, err = sdk.ParseDecCoins(req.Query.GasPrices)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Prices, err = sdk.ParseCoinsNormalized(req.Body.Prices)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, err
+}
+
+type RequestTxPlanUpdateStatus struct {
+	FeeGranter sdk.AccAddress
+	GasPrices  sdk.DecCoins
+	Status     hubtypes.Status
+
+	URI struct {
+		ID uint64 `uri:"id" binding:"gt=0"`
+	}
+	Query TxQuery
+	Body  struct {
+		TxBody
+		Status string `json:"status" binding:"required"`
+	}
+}
+
+func NewRequestTxPlanUpdateStatus(c *gin.Context) (req *RequestTxPlanUpdateStatus, err error) {
+	req = &RequestTxPlanUpdateStatus{}
+	if err = c.ShouldBindUri(&req.URI); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindQuery(&req.Query); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindJSON(&req.Body); err != nil {
+		return nil, err
+	}
+
+	if req.Body.FeeGranter != "" {
+		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.GasPrices, err = sdk.ParseDecCoins(req.Query.GasPrices)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Status = hubtypes.StatusFromString(req.Body.Status)
+
+	return req, err
+}
+
+type RequestTxPlanLinkNode struct {
+	FeeGranter  sdk.AccAddress
+	GasPrices   sdk.DecCoins
+	NodeAddress hubtypes.NodeAddress
+
+	URI struct {
+		ID uint64 `uri:"id" binding:"gt=0"`
+	}
+	Query TxQuery
+	Body  struct {
+		TxBody
+		NodeAddress string `json:"node_address" binding:"required"`
+	}
+}
+
+func NewRequestTxPlanLinkNode(c *gin.Context) (req *RequestTxPlanLinkNode, err error) {
+	req = &RequestTxPlanLinkNode{}
+	if err = c.ShouldBindUri(&req.URI); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindQuery(&req.Query); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindJSON(&req.Body); err != nil {
+		return nil, err
+	}
+
+	if req.Body.FeeGranter != "" {
+		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.GasPrices, err = sdk.ParseDecCoins(req.Query.GasPrices)
+	if err != nil {
+		return nil, err
+	}
+
+	req.NodeAddress, err = hubtypes.NodeAddressFromBech32(req.Body.NodeAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, err
+}
+
+type RequestTxPlanUnlinkNode struct {
+	FeeGranter  sdk.AccAddress
+	GasPrices   sdk.DecCoins
+	NodeAddress hubtypes.NodeAddress
+
+	URI struct {
+		ID          uint64 `uri:"id" binding:"gt=0"`
+		NodeAddress string `uri:"node_address"`
+	}
+	Query TxQuery
+	Body  struct {
+		TxBody
+	}
+}
+
+func NewRequestTxPlanUnlinkNode(c *gin.Context) (req *RequestTxPlanUnlinkNode, err error) {
+	req = &RequestTxPlanUnlinkNode{}
+	if err = c.ShouldBindUri(&req.URI); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindQuery(&req.Query); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindJSON(&req.Body); err != nil {
+		return nil, err
+	}
+
+	if req.Body.FeeGranter != "" {
+		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.GasPrices, err = sdk.ParseDecCoins(req.Query.GasPrices)
+	if err != nil {
+		return nil, err
+	}
+
+	req.NodeAddress, err = hubtypes.NodeAddressFromBech32(req.URI.NodeAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, err
+}
+
+type RequestTxPlanSubscribe struct {
 	FeeGranter sdk.AccAddress
 	GasPrices  sdk.DecCoins
 
@@ -141,8 +324,8 @@ type RequestTxSubscribeToPlan struct {
 	}
 }
 
-func NewRequestTxSubscribeToPlan(c *gin.Context) (req *RequestTxSubscribeToPlan, err error) {
-	req = &RequestTxSubscribeToPlan{}
+func NewRequestTxPlanSubscribe(c *gin.Context) (req *RequestTxPlanSubscribe, err error) {
+	req = &RequestTxPlanSubscribe{}
 	if err = c.ShouldBindUri(&req.URI); err != nil {
 		return nil, err
 	}
@@ -168,7 +351,7 @@ func NewRequestTxSubscribeToPlan(c *gin.Context) (req *RequestTxSubscribeToPlan,
 	return req, err
 }
 
-type RequestTxAllocate struct {
+type RequestTxSubscriptionAllocate struct {
 	FeeGranter sdk.AccAddress
 	GasPrices  sdk.DecCoins
 	AccAddress sdk.AccAddress
@@ -185,8 +368,8 @@ type RequestTxAllocate struct {
 	}
 }
 
-func NewRequestTxAllocate(c *gin.Context) (req *RequestTxAllocate, err error) {
-	req = &RequestTxAllocate{}
+func NewRequestTxSubscriptionAllocate(c *gin.Context) (req *RequestTxSubscriptionAllocate, err error) {
+	req = &RequestTxSubscriptionAllocate{}
 	if err = c.ShouldBindUri(&req.URI); err != nil {
 		return nil, err
 	}
@@ -219,7 +402,7 @@ func NewRequestTxAllocate(c *gin.Context) (req *RequestTxAllocate, err error) {
 	return req, err
 }
 
-type RequestTxStartSession struct {
+type RequestTxSessionStart struct {
 	FeeGranter  sdk.AccAddress
 	GasPrices   sdk.DecCoins
 	NodeAddress hubtypes.NodeAddress
@@ -234,8 +417,8 @@ type RequestTxStartSession struct {
 	}
 }
 
-func NewRequestTxStartSession(c *gin.Context) (req *RequestTxStartSession, err error) {
-	req = &RequestTxStartSession{}
+func NewRequestTxSessionStart(c *gin.Context) (req *RequestTxSessionStart, err error) {
+	req = &RequestTxSessionStart{}
 	if err = c.ShouldBindUri(&req.URI); err != nil {
 		return nil, err
 	}

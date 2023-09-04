@@ -607,8 +607,8 @@ github.com/sasha-s/go-deadlock v0.3.1 h1:sqv7fDNShgjcaxkO0JNcOAlr8B9+cV5Ey/OB71e
 github.com/sasha-s/go-deadlock v0.3.1/go.mod h1:F73l+cr82YSh10GxyRI6qZiCgK64VaZjwesgfQ1/iLM=
 github.com/schollz/closestmatch v2.1.0+incompatible/go.mod h1:RtP1ddjLong6gTkbtmuhtR2uUrrJOpYzYRvbcPAid+g=
 github.com/sclevine/agouti v3.0.0+incompatible/go.mod h1:b4WX9W9L1sfQKXeJf1mUTLZKJ48R1S7H23Ji7oFO5Bw=
-github.com/sentinel-official/hub v0.11.0 h1:kAk46H1HG/Lp1YGVTVV2vSoyOCerXoa0FA6+M3svOcA=
-github.com/sentinel-official/hub v0.11.0/go.mod h1:ZSjGGtuYXjAGI7QrcykklYulylQqLnsXmHxdlYX+9uA=
+github.com/sentinel-official/hub v0.11.3 h1:WTKXheShzIOD1Y4OfS07sSFG1GICLUdofj1eM3fXDEQ=
+github.com/sentinel-official/hub v0.11.3/go.mod h1:GVIozHYdQN7HQRtjfv/i0eXFW1PVeMCES8xI4OFzXHw=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/sergi/go-diff v1.1.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=

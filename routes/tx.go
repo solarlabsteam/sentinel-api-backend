@@ -9,8 +9,16 @@ import (
 
 func RegisterTxRoutes(router gin.IRouter, ctx context.Context) {
 	router.POST("/balances", handlers.HandlerTxBankSend(ctx))
-	router.POST("/nodes/:node_address/subscriptions", handlers.HandlerTxSubscribeToNode(ctx))
-	router.POST("/plans/:id/subscriptions", handlers.HandlerTxSubscribeToPlan(ctx))
-	router.POST("/subscriptions/:id/allocations", handlers.HandlerTxAllocate(ctx))
-	router.POST("/subscriptions/:id/nodes/:node_address/sessions", handlers.HandlerTxStartSession(ctx))
+
+	router.POST("/nodes/:node_address/subscriptions", handlers.HandlerTxNodeSubscribe(ctx))
+
+	router.POST("/plans", handlers.HandlerTxPlanCreate(ctx))
+	router.PUT("/plans/:id", handlers.HandlerTxPlanUpdateStatus(ctx))
+	router.POST("/plans/:id/nodes", handlers.HandlerTxPlanLinkNode(ctx))
+	router.DELETE("/plans/:id/nodes/:node_address", handlers.HandlerTxPlanUnlinkNode(ctx))
+	router.POST("/plans/:id/subscriptions", handlers.HandlerTxPlanSubscribe(ctx))
+
+	router.POST("/subscriptions/:id/allocations", handlers.HandlerTxSubscriptionAllocate(ctx))
+
+	router.POST("/subscriptions/:id/nodes/:node_address/sessions", handlers.HandlerTxSessionStart(ctx))
 }

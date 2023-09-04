@@ -46,9 +46,129 @@ func HandlerTxBankSend(ctx context.Context) gin.HandlerFunc {
 	}
 }
 
-func HandlerTxSubscribeToNode(ctx context.Context) gin.HandlerFunc {
+func HandlerTxPlanCreate(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		req, err := requests.NewRequestTxSubscribeToNode(c)
+		req, err := requests.NewRequestTxPlanCreate(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
+			return
+		}
+
+		kr, key, err := utils.NewInMemoryKey(req.Body.Mnemonic, req.Query.CoinType, req.Query.Account, req.Query.Index, req.Body.BIP39Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
+			return
+		}
+
+		message := plantypes.NewMsgCreateRequest(key.GetAddress().Bytes(), req.Body.Duration, req.Body.Gigabytes, req.Prices)
+
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(result))
+	}
+}
+
+func HandlerTxPlanUpdateStatus(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req, err := requests.NewRequestTxPlanUpdateStatus(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
+			return
+		}
+
+		kr, key, err := utils.NewInMemoryKey(req.Body.Mnemonic, req.Query.CoinType, req.Query.Account, req.Query.Index, req.Body.BIP39Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
+			return
+		}
+
+		message := plantypes.NewMsgUpdateStatusRequest(key.GetAddress().Bytes(), req.URI.ID, req.Status)
+
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(result))
+	}
+}
+
+func HandlerTxPlanLinkNode(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req, err := requests.NewRequestTxPlanLinkNode(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
+			return
+		}
+
+		kr, key, err := utils.NewInMemoryKey(req.Body.Mnemonic, req.Query.CoinType, req.Query.Account, req.Query.Index, req.Body.BIP39Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
+			return
+		}
+
+		message := plantypes.NewMsgLinkNodeRequest(key.GetAddress().Bytes(), req.URI.ID, req.NodeAddress)
+
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(result))
+	}
+}
+
+func HandlerTxPlanUnlinkNode(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req, err := requests.NewRequestTxPlanUnlinkNode(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
+			return
+		}
+
+		kr, key, err := utils.NewInMemoryKey(req.Body.Mnemonic, req.Query.CoinType, req.Query.Account, req.Query.Index, req.Body.BIP39Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
+			return
+		}
+
+		message := plantypes.NewMsgUnlinkNodeRequest(key.GetAddress().Bytes(), req.URI.ID, req.NodeAddress)
+
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(result))
+	}
+}
+
+func HandlerTxNodeSubscribe(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req, err := requests.NewRequestTxNodeSubscribe(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
 			return
@@ -76,9 +196,9 @@ func HandlerTxSubscribeToNode(ctx context.Context) gin.HandlerFunc {
 	}
 }
 
-func HandlerTxSubscribeToPlan(ctx context.Context) gin.HandlerFunc {
+func HandlerTxPlanSubscribe(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		req, err := requests.NewRequestTxSubscribeToPlan(c)
+		req, err := requests.NewRequestTxPlanSubscribe(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
 			return
@@ -106,9 +226,9 @@ func HandlerTxSubscribeToPlan(ctx context.Context) gin.HandlerFunc {
 	}
 }
 
-func HandlerTxAllocate(ctx context.Context) gin.HandlerFunc {
+func HandlerTxSubscriptionAllocate(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		req, err := requests.NewRequestTxAllocate(c)
+		req, err := requests.NewRequestTxSubscriptionAllocate(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
 			return
@@ -136,9 +256,9 @@ func HandlerTxAllocate(ctx context.Context) gin.HandlerFunc {
 	}
 }
 
-func HandlerTxStartSession(ctx context.Context) gin.HandlerFunc {
+func HandlerTxSessionStart(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		req, err := requests.NewRequestTxStartSession(c)
+		req, err := requests.NewRequestTxSessionStart(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
 			return
