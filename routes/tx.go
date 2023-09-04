@@ -15,7 +15,7 @@ func RegisterTxRoutes(router gin.IRouter, ctx context.Context) {
 	router.POST("/plans", handlers.HandlerTxPlanCreate(ctx))
 	router.PUT("/plans/:id", handlers.HandlerTxPlanUpdateStatus(ctx))
 	router.POST("/plans/:id/nodes", handlers.HandlerTxPlanLinkNode(ctx))
-	router.DELETE("/plans/:id/nodes/:node_address", handlers.HandlerTxPlanUnlinkNode(ctx))
+	router.PUT("/plans/:id/nodes/:node_address", handlers.HandlerTxPlanUnlinkNode(ctx))
 	router.POST("/plans/:id/subscriptions", handlers.HandlerTxPlanSubscribe(ctx))
 
 	router.POST("/subscriptions/:id/allocations", handlers.HandlerTxSubscriptionAllocate(ctx))
