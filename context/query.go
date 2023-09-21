@@ -2,6 +2,7 @@ package context
 
 import (
 	"context"
+	"sync"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,10 +22,14 @@ import (
 
 type Context struct {
 	client.Context
+	mutex map[string]*sync.Mutex
 }
 
 func GetContextFromCmd(cmd *cobra.Command) Context {
-	return Context{Context: client.GetClientContextFromCmd(cmd)}
+	return Context{
+		Context: client.GetClientContextFromCmd(cmd),
+		mutex:   make(map[string]*sync.Mutex),
+	}
 }
 
 func (c Context) QueryAccount(rpcAddress string, accAddr sdk.AccAddress) (result authtypes.AccountI, err error) {

@@ -1,6 +1,8 @@
 package context
 
 import (
+	"sync"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -24,7 +26,19 @@ func (c Context) Tx(
 		return nil, err
 	}
 
-	account, err := c.QueryAccount(rpcAddress, key.GetAddress())
+	var (
+		accAddr       = key.GetAddress()
+		bech32AccAddr = accAddr.String()
+	)
+
+	if _, ok := c.mutex[bech32AccAddr]; !ok {
+		c.mutex[bech32AccAddr] = &sync.Mutex{}
+	}
+
+	c.mutex[bech32AccAddr].Lock()
+	defer c.mutex[bech32AccAddr].Unlock()
+
+	account, err := c.QueryAccount(rpcAddress, accAddr)
 	if err != nil {
 		return nil, err
 	}
