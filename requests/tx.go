@@ -1,6 +1,7 @@
 package requests
 
 import (
+	"fmt"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -33,16 +34,16 @@ type (
 )
 
 type RequestTxBankSend struct {
-	FeeGranter   sdk.AccAddress
-	GasPrices    sdk.DecCoins
-	ToAccAddress sdk.AccAddress
-	Amount       sdk.Coins
+	FeeGranter     sdk.AccAddress
+	GasPrices      sdk.DecCoins
+	ToAccAddresses []sdk.AccAddress
+	Amounts        []sdk.Coins
 
 	Query TxQuery
 	Body  struct {
 		TxBody
-		ToAccAddress string `json:"to_acc_address" binding:"required"`
-		Amount       string `json:"amount" binding:"required"`
+		ToAccAddresses []string `json:"to_acc_addresses" binding:"required"`
+		Amounts        []string `json:"amounts" binding:"required"`
 	}
 }
 
@@ -67,14 +68,26 @@ func NewRequestTxBankSend(c *gin.Context) (req *RequestTxBankSend, err error) {
 		return nil, err
 	}
 
-	req.ToAccAddress, err = sdk.AccAddressFromBech32(req.Body.ToAccAddress)
-	if err != nil {
-		return nil, err
+	if len(req.Body.ToAccAddresses) != len(req.Body.Amounts) {
+		return nil, fmt.Errorf("to_acc_addresses length must be equal to the amounts length")
 	}
 
-	req.Amount, err = sdk.ParseCoinsNormalized(req.Body.Amount)
-	if err != nil {
-		return nil, err
+	for _, s := range req.Body.ToAccAddresses {
+		v, err := sdk.AccAddressFromBech32(s)
+		if err != nil {
+			return nil, err
+		}
+
+		req.ToAccAddresses = append(req.ToAccAddresses, v)
+	}
+
+	for _, s := range req.Body.Amounts {
+		v, err := sdk.ParseCoinsNormalized(s)
+		if err != nil {
+			return nil, err
+		}
+
+		req.Amounts = append(req.Amounts, v)
 	}
 
 	return req, err
@@ -352,10 +365,10 @@ func NewRequestTxPlanSubscribe(c *gin.Context) (req *RequestTxPlanSubscribe, err
 }
 
 type RequestTxSubscriptionAllocate struct {
-	FeeGranter sdk.AccAddress
-	GasPrices  sdk.DecCoins
-	AccAddress sdk.AccAddress
-	Bytes      sdk.Int
+	FeeGranter   sdk.AccAddress
+	GasPrices    sdk.DecCoins
+	AccAddresses []sdk.AccAddress
+	Bytes        []sdk.Int
 
 	URI struct {
 		ID uint64 `uri:"id" binding:"gt=0"`
@@ -363,8 +376,8 @@ type RequestTxSubscriptionAllocate struct {
 	Query TxQuery
 	Body  struct {
 		TxBody
-		AccAddress string `json:"acc_address" binding:"required"`
-		Bytes      int64  `json:"bytes"`
+		AccAddresses []string `json:"acc_addresses" binding:"required"`
+		Bytes        []int64  `json:"bytes" binding:"required"`
 	}
 }
 
@@ -392,12 +405,22 @@ func NewRequestTxSubscriptionAllocate(c *gin.Context) (req *RequestTxSubscriptio
 		return nil, err
 	}
 
-	req.AccAddress, err = sdk.AccAddressFromBech32(req.Body.AccAddress)
-	if err != nil {
-		return nil, err
+	if len(req.Body.AccAddresses) != len(req.Body.Bytes) {
+		return nil, fmt.Errorf("acc_addresses length must be equal to the bytes length")
 	}
 
-	req.Bytes = sdk.NewInt(req.Body.Bytes)
+	for _, s := range req.Body.AccAddresses {
+		v, err := sdk.AccAddressFromBech32(s)
+		if err != nil {
+			return nil, err
+		}
+
+		req.AccAddresses = append(req.AccAddresses, v)
+	}
+
+	for _, i := range req.Body.Bytes {
+		req.Bytes = append(req.Bytes, sdk.NewInt(i))
+	}
 
 	return req, err
 }

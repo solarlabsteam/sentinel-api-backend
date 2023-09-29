@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/gin-gonic/gin"
 	nodetypes "github.com/sentinel-official/hub/x/node/types"
@@ -30,12 +31,15 @@ func HandlerTxBankSend(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := banktypes.NewMsgSend(key.GetAddress(), req.ToAccAddress, req.Amount)
+		var messages []sdk.Msg
+		for i := 0; i < len(req.ToAccAddresses); i++ {
+			messages = append(messages, banktypes.NewMsgSend(key.GetAddress(), req.ToAccAddresses[i], req.Amounts[i]))
+		}
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
-			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
@@ -240,12 +244,15 @@ func HandlerTxSubscriptionAllocate(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := subscriptiontypes.NewMsgAllocateRequest(key.GetAddress(), req.URI.ID, req.AccAddress, req.Bytes)
+		var messages []sdk.Msg
+		for i := 0; i < len(req.AccAddresses); i++ {
+			messages = append(messages, subscriptiontypes.NewMsgAllocateRequest(key.GetAddress(), req.URI.ID, req.AccAddresses[i], req.Bytes[i]))
+		}
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
-			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
