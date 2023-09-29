@@ -230,9 +230,9 @@ func NewRequestTxPlanUpdateStatus(c *gin.Context) (req *RequestTxPlanUpdateStatu
 }
 
 type RequestTxPlanLinkNode struct {
-	FeeGranter  sdk.AccAddress
-	GasPrices   sdk.DecCoins
-	NodeAddress hubtypes.NodeAddress
+	FeeGranter    sdk.AccAddress
+	GasPrices     sdk.DecCoins
+	NodeAddresses []hubtypes.NodeAddress
 
 	URI struct {
 		ID uint64 `uri:"id" binding:"gt=0"`
@@ -240,7 +240,7 @@ type RequestTxPlanLinkNode struct {
 	Query TxQuery
 	Body  struct {
 		TxBody
-		NodeAddress string `json:"node_address" binding:"required"`
+		NodeAddresses []string `json:"node_addresses" binding:"required"`
 	}
 }
 
@@ -268,9 +268,13 @@ func NewRequestTxPlanLinkNode(c *gin.Context) (req *RequestTxPlanLinkNode, err e
 		return nil, err
 	}
 
-	req.NodeAddress, err = hubtypes.NodeAddressFromBech32(req.Body.NodeAddress)
-	if err != nil {
-		return nil, err
+	for _, s := range req.Body.NodeAddresses {
+		v, err := hubtypes.NodeAddressFromBech32(s)
+		if err != nil {
+			return nil, err
+		}
+
+		req.NodeAddresses = append(req.NodeAddresses, v)
 	}
 
 	return req, err

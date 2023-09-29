@@ -124,12 +124,15 @@ func HandlerTxPlanLinkNode(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := plantypes.NewMsgLinkNodeRequest(key.GetAddress().Bytes(), req.URI.ID, req.NodeAddress)
+		var messages []sdk.Msg
+		for i := 0; i < len(req.NodeAddresses); i++ {
+			messages = append(messages, plantypes.NewMsgLinkNodeRequest(key.GetAddress().Bytes(), req.URI.ID, req.NodeAddresses[i]))
+		}
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
-			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
