@@ -475,3 +475,62 @@ func NewRequestTxSessionStart(c *gin.Context) (req *RequestTxSessionStart, err e
 
 	return req, err
 }
+
+type RequestTxSubscribe struct {
+	FeeGranter    sdk.AccAddress
+	GasPrices     sdk.DecCoins
+	NodeAddresses []hubtypes.NodeAddress
+
+	Query TxQuery
+	Body  struct {
+		TxBody
+		Denoms        []string `json:"denoms"`
+		Gigabytes     []int64  `json:"gigabytes"`
+		Hours         []int64  `json:"hours"`
+		NodeAddresses []string `json:"node_addresses"`
+		PlanIDs       []uint64 `json:"plan_ids"`
+	}
+}
+
+func NewRequestTxSubscribe(c *gin.Context) (req *RequestTxSubscribe, err error) {
+	req = &RequestTxSubscribe{}
+	if err = c.ShouldBindQuery(&req.Query); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindJSON(&req.Body); err != nil {
+		return nil, err
+	}
+
+	if len(req.Body.Denoms) != len(req.Body.NodeAddresses)+len(req.Body.PlanIDs) {
+		return nil, fmt.Errorf("invalid denoms length")
+	}
+	if len(req.Body.Gigabytes) != len(req.Body.NodeAddresses) {
+		return nil, fmt.Errorf("invalid gigabytes length")
+	}
+	if len(req.Body.Hours) != len(req.Body.NodeAddresses) {
+		return nil, fmt.Errorf("invalid hours length")
+	}
+
+	for _, s := range req.Body.NodeAddresses {
+		addr, err := hubtypes.NodeAddressFromBech32(s)
+		if err != nil {
+			return nil, err
+		}
+
+		req.NodeAddresses = append(req.NodeAddresses, addr)
+	}
+
+	if req.Body.FeeGranter != "" {
+		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.GasPrices, err = sdk.ParseDecCoins(req.Query.GasPrices)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, err
+}

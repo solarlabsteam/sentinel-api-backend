@@ -18,6 +18,8 @@ func RegisterTxRoutes(router gin.IRouter, ctx context.Context) {
 	router.PUT("/plans/:id/nodes/:node_address", handlers.HandlerTxPlanUnlinkNode(ctx))
 	router.POST("/plans/:id/subscriptions", handlers.HandlerTxPlanSubscribe(ctx))
 
+	router.POST("/subscriptions", handlers.HandlerTxSubscribe(ctx))
+
 	router.POST("/subscriptions/:id/allocations", handlers.HandlerTxSubscriptionAllocate(ctx))
 
 	router.POST("/subscriptions/:id/nodes/:node_address/sessions", handlers.HandlerTxSessionStart(ctx))

@@ -295,3 +295,49 @@ func HandlerTxSessionStart(ctx context.Context) gin.HandlerFunc {
 		c.JSON(http.StatusOK, types.NewResponseResult(result))
 	}
 }
+
+func HandlerTxSubscribe(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req, err := requests.NewRequestTxSubscribe(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
+			return
+		}
+
+		kr, key, err := utils.NewInMemoryKey(req.Body.Mnemonic, req.Query.CoinType, req.Query.Account, req.Query.Index, req.Body.BIP39Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
+			return
+		}
+
+		var (
+			dIndex   = 0
+			messages []sdk.Msg
+		)
+
+		for i := 0; i < len(req.NodeAddresses) && dIndex < len(req.Body.Denoms); dIndex, i = dIndex+1, i+1 {
+			messages = append(
+				messages,
+				nodetypes.NewMsgSubscribeRequest(key.GetAddress(), req.NodeAddresses[i], req.Body.Gigabytes[i], req.Body.Hours[i], req.Body.Denoms[dIndex]),
+			)
+		}
+		for i := 0; i < len(req.Body.PlanIDs) && dIndex < len(req.Body.Denoms); dIndex, i = dIndex+1, i+1 {
+			messages = append(
+				messages,
+				plantypes.NewMsgSubscribeRequest(key.GetAddress(), req.Body.PlanIDs[i], req.Body.Denoms[dIndex]),
+			)
+		}
+
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(result))
+	}
+}
