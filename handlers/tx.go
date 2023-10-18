@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/gin-gonic/gin"
 	nodetypes "github.com/sentinel-official/hub/x/node/types"
@@ -31,9 +32,19 @@ func HandlerTxBankSend(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
 		var messages []sdk.Msg
 		for i := 0; i < len(req.ToAccAddresses); i++ {
-			messages = append(messages, banktypes.NewMsgSend(key.GetAddress(), req.ToAccAddresses[i], req.Amounts[i]))
+			messages = append(messages, banktypes.NewMsgSend(fromAddr, req.ToAccAddresses[i], req.Amounts[i]))
+		}
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
 		}
 
 		result, err := ctx.Tx(
@@ -64,12 +75,23 @@ func HandlerTxPlanCreate(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := plantypes.NewMsgCreateRequest(key.GetAddress().Bytes(), req.Body.Duration, req.Body.Gigabytes, req.Prices)
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
+		var messages []sdk.Msg
+		messages = append(messages, plantypes.NewMsgCreateRequest(fromAddr.Bytes(), req.Body.Duration, req.Body.Gigabytes, req.Prices))
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
+		}
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
-			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
@@ -94,12 +116,23 @@ func HandlerTxPlanUpdateStatus(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := plantypes.NewMsgUpdateStatusRequest(key.GetAddress().Bytes(), req.URI.ID, req.Status)
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
+		var messages []sdk.Msg
+		messages = append(messages, plantypes.NewMsgUpdateStatusRequest(fromAddr.Bytes(), req.URI.ID, req.Status))
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
+		}
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
-			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
@@ -124,9 +157,19 @@ func HandlerTxPlanLinkNode(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
 		var messages []sdk.Msg
 		for i := 0; i < len(req.NodeAddresses); i++ {
-			messages = append(messages, plantypes.NewMsgLinkNodeRequest(key.GetAddress().Bytes(), req.URI.ID, req.NodeAddresses[i]))
+			messages = append(messages, plantypes.NewMsgLinkNodeRequest(fromAddr.Bytes(), req.URI.ID, req.NodeAddresses[i]))
+		}
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
 		}
 
 		result, err := ctx.Tx(
@@ -157,12 +200,23 @@ func HandlerTxPlanUnlinkNode(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := plantypes.NewMsgUnlinkNodeRequest(key.GetAddress().Bytes(), req.URI.ID, req.NodeAddress)
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
+		var messages []sdk.Msg
+		messages = append(messages, plantypes.NewMsgUnlinkNodeRequest(fromAddr.Bytes(), req.URI.ID, req.NodeAddress))
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
+		}
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
-			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
@@ -187,12 +241,23 @@ func HandlerTxNodeSubscribe(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := nodetypes.NewMsgSubscribeRequest(key.GetAddress(), req.NodeAddress, req.Body.Gigabytes, req.Body.Hours, req.Body.Denom)
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
+		var messages []sdk.Msg
+		messages = append(messages, nodetypes.NewMsgSubscribeRequest(fromAddr, req.NodeAddress, req.Body.Gigabytes, req.Body.Hours, req.Body.Denom))
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
+		}
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
-			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
@@ -217,12 +282,23 @@ func HandlerTxPlanSubscribe(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := plantypes.NewMsgSubscribeRequest(key.GetAddress(), req.URI.ID, req.Body.Denom)
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
+		var messages []sdk.Msg
+		messages = append(messages, plantypes.NewMsgSubscribeRequest(fromAddr, req.URI.ID, req.Body.Denom))
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
+		}
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
-			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
@@ -247,9 +323,19 @@ func HandlerTxSubscriptionAllocate(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
 		var messages []sdk.Msg
 		for i := 0; i < len(req.AccAddresses); i++ {
-			messages = append(messages, subscriptiontypes.NewMsgAllocateRequest(key.GetAddress(), req.URI.ID, req.AccAddresses[i], req.Bytes[i]))
+			messages = append(messages, subscriptiontypes.NewMsgAllocateRequest(fromAddr, req.URI.ID, req.AccAddresses[i], req.Bytes[i]))
+		}
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
 		}
 
 		result, err := ctx.Tx(
@@ -280,12 +366,23 @@ func HandlerTxSessionStart(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		message := sessiontypes.NewMsgStartRequest(key.GetAddress(), req.URI.ID, req.NodeAddress)
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
+		var messages []sdk.Msg
+		messages = append(messages, sessiontypes.NewMsgStartRequest(fromAddr, req.URI.ID, req.NodeAddress))
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
+		}
 
 		result, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
-			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, message,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
@@ -310,6 +407,11 @@ func HandlerTxSubscribe(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
 		var (
 			dIndex   = 0
 			messages []sdk.Msg
@@ -318,14 +420,19 @@ func HandlerTxSubscribe(ctx context.Context) gin.HandlerFunc {
 		for i := 0; i < len(req.NodeAddresses) && dIndex < len(req.Body.Denoms); dIndex, i = dIndex+1, i+1 {
 			messages = append(
 				messages,
-				nodetypes.NewMsgSubscribeRequest(key.GetAddress(), req.NodeAddresses[i], req.Body.Gigabytes[i], req.Body.Hours[i], req.Body.Denoms[dIndex]),
+				nodetypes.NewMsgSubscribeRequest(fromAddr, req.NodeAddresses[i], req.Body.Gigabytes[i], req.Body.Hours[i], req.Body.Denoms[dIndex]),
 			)
 		}
 		for i := 0; i < len(req.Body.PlanIDs) && dIndex < len(req.Body.Denoms); dIndex, i = dIndex+1, i+1 {
 			messages = append(
 				messages,
-				plantypes.NewMsgSubscribeRequest(key.GetAddress(), req.Body.PlanIDs[i], req.Body.Denoms[dIndex]),
+				plantypes.NewMsgSubscribeRequest(fromAddr, req.Body.PlanIDs[i], req.Body.Denoms[dIndex]),
 			)
+		}
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
 		}
 
 		result, err := ctx.Tx(

@@ -23,6 +23,7 @@ type (
 		SimulateAndExecute bool    `form:"simulate_and_execute,default=true"`
 	}
 	TxBody struct {
+		AuthzGranter  string `json:"authz_granter"`
 		BIP39Password string `json:"bip39_password"`
 		FeeGranter    string `json:"fee_granter"`
 		Fees          string `json:"fees"`
@@ -34,6 +35,7 @@ type (
 )
 
 type RequestTxBankSend struct {
+	AuthzGranter   sdk.AccAddress
 	FeeGranter     sdk.AccAddress
 	GasPrices      sdk.DecCoins
 	ToAccAddresses []sdk.AccAddress
@@ -54,6 +56,13 @@ func NewRequestTxBankSend(c *gin.Context) (req *RequestTxBankSend, err error) {
 	}
 	if err = c.ShouldBindJSON(&req.Body); err != nil {
 		return nil, err
+	}
+
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if req.Body.FeeGranter != "" {
@@ -94,9 +103,10 @@ func NewRequestTxBankSend(c *gin.Context) (req *RequestTxBankSend, err error) {
 }
 
 type RequestTxNodeSubscribe struct {
-	FeeGranter  sdk.AccAddress
-	GasPrices   sdk.DecCoins
-	NodeAddress hubtypes.NodeAddress
+	AuthzGranter sdk.AccAddress
+	FeeGranter   sdk.AccAddress
+	GasPrices    sdk.DecCoins
+	NodeAddress  hubtypes.NodeAddress
 
 	URI struct {
 		NodeAddress string `uri:"node_address"`
@@ -127,6 +137,13 @@ func NewRequestTxNodeSubscribe(c *gin.Context) (req *RequestTxNodeSubscribe, err
 		return nil, err
 	}
 
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if req.Body.FeeGranter != "" {
 		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
 		if err != nil {
@@ -143,9 +160,10 @@ func NewRequestTxNodeSubscribe(c *gin.Context) (req *RequestTxNodeSubscribe, err
 }
 
 type RequestTxPlanCreate struct {
-	FeeGranter sdk.AccAddress
-	GasPrices  sdk.DecCoins
-	Prices     sdk.Coins
+	AuthzGranter sdk.AccAddress
+	FeeGranter   sdk.AccAddress
+	GasPrices    sdk.DecCoins
+	Prices       sdk.Coins
 
 	Query TxQuery
 	Body  struct {
@@ -163,6 +181,13 @@ func NewRequestTxPlanCreate(c *gin.Context) (req *RequestTxPlanCreate, err error
 	}
 	if err = c.ShouldBindJSON(&req.Body); err != nil {
 		return nil, err
+	}
+
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if req.Body.FeeGranter != "" {
@@ -186,9 +211,10 @@ func NewRequestTxPlanCreate(c *gin.Context) (req *RequestTxPlanCreate, err error
 }
 
 type RequestTxPlanUpdateStatus struct {
-	FeeGranter sdk.AccAddress
-	GasPrices  sdk.DecCoins
-	Status     hubtypes.Status
+	AuthzGranter sdk.AccAddress
+	FeeGranter   sdk.AccAddress
+	GasPrices    sdk.DecCoins
+	Status       hubtypes.Status
 
 	URI struct {
 		ID uint64 `uri:"id" binding:"gt=0"`
@@ -212,6 +238,13 @@ func NewRequestTxPlanUpdateStatus(c *gin.Context) (req *RequestTxPlanUpdateStatu
 		return nil, err
 	}
 
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if req.Body.FeeGranter != "" {
 		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
 		if err != nil {
@@ -230,6 +263,7 @@ func NewRequestTxPlanUpdateStatus(c *gin.Context) (req *RequestTxPlanUpdateStatu
 }
 
 type RequestTxPlanLinkNode struct {
+	AuthzGranter  sdk.AccAddress
 	FeeGranter    sdk.AccAddress
 	GasPrices     sdk.DecCoins
 	NodeAddresses []hubtypes.NodeAddress
@@ -254,6 +288,13 @@ func NewRequestTxPlanLinkNode(c *gin.Context) (req *RequestTxPlanLinkNode, err e
 	}
 	if err = c.ShouldBindJSON(&req.Body); err != nil {
 		return nil, err
+	}
+
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if req.Body.FeeGranter != "" {
@@ -281,9 +322,10 @@ func NewRequestTxPlanLinkNode(c *gin.Context) (req *RequestTxPlanLinkNode, err e
 }
 
 type RequestTxPlanUnlinkNode struct {
-	FeeGranter  sdk.AccAddress
-	GasPrices   sdk.DecCoins
-	NodeAddress hubtypes.NodeAddress
+	AuthzGranter sdk.AccAddress
+	FeeGranter   sdk.AccAddress
+	GasPrices    sdk.DecCoins
+	NodeAddress  hubtypes.NodeAddress
 
 	URI struct {
 		ID          uint64 `uri:"id" binding:"gt=0"`
@@ -307,6 +349,13 @@ func NewRequestTxPlanUnlinkNode(c *gin.Context) (req *RequestTxPlanUnlinkNode, e
 		return nil, err
 	}
 
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if req.Body.FeeGranter != "" {
 		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
 		if err != nil {
@@ -328,8 +377,9 @@ func NewRequestTxPlanUnlinkNode(c *gin.Context) (req *RequestTxPlanUnlinkNode, e
 }
 
 type RequestTxPlanSubscribe struct {
-	FeeGranter sdk.AccAddress
-	GasPrices  sdk.DecCoins
+	AuthzGranter sdk.AccAddress
+	FeeGranter   sdk.AccAddress
+	GasPrices    sdk.DecCoins
 
 	URI struct {
 		ID uint64 `uri:"id" binding:"gt=0"`
@@ -353,6 +403,13 @@ func NewRequestTxPlanSubscribe(c *gin.Context) (req *RequestTxPlanSubscribe, err
 		return nil, err
 	}
 
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if req.Body.FeeGranter != "" {
 		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
 		if err != nil {
@@ -369,6 +426,7 @@ func NewRequestTxPlanSubscribe(c *gin.Context) (req *RequestTxPlanSubscribe, err
 }
 
 type RequestTxSubscriptionAllocate struct {
+	AuthzGranter sdk.AccAddress
 	FeeGranter   sdk.AccAddress
 	GasPrices    sdk.DecCoins
 	AccAddresses []sdk.AccAddress
@@ -395,6 +453,13 @@ func NewRequestTxSubscriptionAllocate(c *gin.Context) (req *RequestTxSubscriptio
 	}
 	if err = c.ShouldBindJSON(&req.Body); err != nil {
 		return nil, err
+	}
+
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if req.Body.FeeGranter != "" {
@@ -430,9 +495,10 @@ func NewRequestTxSubscriptionAllocate(c *gin.Context) (req *RequestTxSubscriptio
 }
 
 type RequestTxSessionStart struct {
-	FeeGranter  sdk.AccAddress
-	GasPrices   sdk.DecCoins
-	NodeAddress hubtypes.NodeAddress
+	AuthzGranter sdk.AccAddress
+	FeeGranter   sdk.AccAddress
+	GasPrices    sdk.DecCoins
+	NodeAddress  hubtypes.NodeAddress
 
 	URI struct {
 		ID          uint64 `uri:"id" binding:"gt=0"`
@@ -461,6 +527,13 @@ func NewRequestTxSessionStart(c *gin.Context) (req *RequestTxSessionStart, err e
 		return nil, err
 	}
 
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if req.Body.FeeGranter != "" {
 		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
 		if err != nil {
@@ -477,6 +550,7 @@ func NewRequestTxSessionStart(c *gin.Context) (req *RequestTxSessionStart, err e
 }
 
 type RequestTxSubscribe struct {
+	AuthzGranter  sdk.AccAddress
 	FeeGranter    sdk.AccAddress
 	GasPrices     sdk.DecCoins
 	NodeAddresses []hubtypes.NodeAddress
@@ -518,6 +592,13 @@ func NewRequestTxSubscribe(c *gin.Context) (req *RequestTxSubscribe, err error) 
 		}
 
 		req.NodeAddresses = append(req.NodeAddresses, addr)
+	}
+
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if req.Body.FeeGranter != "" {
