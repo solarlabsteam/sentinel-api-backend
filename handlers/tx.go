@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	"github.com/gin-gonic/gin"
 	nodetypes "github.com/sentinel-official/hub/x/node/types"
 	plantypes "github.com/sentinel-official/hub/x/plan/types"
@@ -17,6 +18,62 @@ import (
 	"github.com/solarlabsteam/sentinel-api-backend/types"
 	"github.com/solarlabsteam/sentinel-api-backend/utils"
 )
+
+func HandlerTxFeegrantGrantAllowance(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req, err := requests.NewRequestTxFeegrantGrantAllowance(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
+			return
+		}
+
+		kr, key, err := utils.NewInMemoryKey(req.Body.Mnemonic, req.Query.CoinType, req.Query.Account, req.Query.Index, req.Body.BIP39Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
+			return
+		}
+
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
+		var (
+			messages       []sdk.Msg
+			basicAllowance = &feegrant.BasicAllowance{
+				SpendLimit: req.SpendLimit,
+				Expiration: &req.Body.Expiration,
+			}
+		)
+
+		for i := 0; i < len(req.AccAddresses); i++ {
+			message, err := feegrant.NewMsgGrantAllowance(basicAllowance, fromAddr, req.AccAddresses[i])
+			if err != nil {
+				c.JSON(http.StatusBadRequest, types.NewResponseError(3, err))
+				return
+			}
+
+			messages = append(messages, message)
+		}
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
+		}
+
+		result, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(result))
+	}
+}
 
 func HandlerTxBankSend(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {

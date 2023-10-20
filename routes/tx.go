@@ -8,6 +8,8 @@ import (
 )
 
 func RegisterTxRoutes(router gin.IRouter, ctx context.Context) {
+	router.POST("/feegrants", handlers.HandlerTxFeegrantGrantAllowance(ctx))
+
 	router.POST("/balances", handlers.HandlerTxBankSend(ctx))
 
 	router.POST("/nodes/:node_address/subscriptions", handlers.HandlerTxNodeSubscribe(ctx))
