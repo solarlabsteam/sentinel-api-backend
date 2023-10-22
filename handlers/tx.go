@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
@@ -38,11 +39,16 @@ func HandlerTxFeegrantGrantAllowance(ctx context.Context) gin.HandlerFunc {
 			fromAddr = req.AuthzGranter
 		}
 
+		var expiration *time.Time
+		if !req.Body.Expiration.IsZero() {
+			expiration = &req.Body.Expiration
+		}
+
 		var (
 			messages       []sdk.Msg
 			basicAllowance = &feegrant.BasicAllowance{
 				SpendLimit: req.SpendLimit,
-				Expiration: &req.Body.Expiration,
+				Expiration: expiration,
 			}
 		)
 
