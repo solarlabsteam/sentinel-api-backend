@@ -31,13 +31,13 @@ func HandlerGetAccount(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		var m json.RawMessage
-		if err := json.Unmarshal(buf, &m); err != nil {
+		var item interface{}
+		if err := json.Unmarshal(buf, &item); err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(m))
+		c.JSON(http.StatusOK, types.NewResponseResult(item))
 	}
 }
 
@@ -73,7 +73,24 @@ func HandlerFeegrantAllowancesByGranter(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		var items []interface{}
+		for i := 0; i < len(result); i++ {
+			buf, err := ctx.Codec.MarshalJSON(result[i])
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
+				return
+			}
+
+			var item interface{}
+			if err := json.Unmarshal(buf, &item); err != nil {
+				c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
+				return
+			}
+
+			items = append(items, item)
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(items))
 	}
 }
 
@@ -91,7 +108,24 @@ func HandlerFeegrantAllowances(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		var items []interface{}
+		for i := 0; i < len(result); i++ {
+			buf, err := ctx.Codec.MarshalJSON(result[i])
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
+				return
+			}
+
+			var item interface{}
+			if err := json.Unmarshal(buf, &item); err != nil {
+				c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
+				return
+			}
+
+			items = append(items, item)
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(items))
 	}
 }
 
