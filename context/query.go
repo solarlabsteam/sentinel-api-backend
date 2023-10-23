@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/query"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	hubtypes "github.com/sentinel-official/hub/types"
 	deposittypes "github.com/sentinel-official/hub/x/deposit/types"
 	nodetypes "github.com/sentinel-official/hub/x/node/types"
@@ -71,6 +72,50 @@ func (c Context) QueryBalances(rpcAddress string, accAddr sdk.AccAddress, pagina
 	}
 
 	return resp.Balances, nil
+}
+
+func (c Context) QueryFeegrantAllowancesByGranter(rpcAddress string, accAddr sdk.AccAddress, pagination *query.PageRequest) (result []*feegrant.Grant, err error) {
+	c.Client, err = rpchttp.New(rpcAddress, "/websocket")
+	if err != nil {
+		return nil, err
+	}
+
+	qc := feegrant.NewQueryClient(c)
+	resp, err := qc.AllowancesByGranter(
+		context.Background(),
+		&feegrant.QueryAllowancesByGranterRequest{
+			Granter:    accAddr.String(),
+			Pagination: pagination,
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Allowances, nil
+}
+
+func (c Context) QueryFeegrantAllowances(rpcAddress string, accAddr sdk.AccAddress, pagination *query.PageRequest) (result []*feegrant.Grant, err error) {
+	c.Client, err = rpchttp.New(rpcAddress, "/websocket")
+	if err != nil {
+		return nil, err
+	}
+
+	qc := feegrant.NewQueryClient(c)
+	resp, err := qc.Allowances(
+		context.Background(),
+		&feegrant.QueryAllowancesRequest{
+			Grantee:    accAddr.String(),
+			Pagination: pagination,
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Allowances, nil
 }
 
 func (c Context) QueryDeposit(rpcAddress string, accAddr sdk.AccAddress) (result *deposittypes.Deposit, err error) {

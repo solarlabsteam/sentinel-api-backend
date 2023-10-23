@@ -89,6 +89,108 @@ func NewRequestGetBalancesForAccount(c *gin.Context) (req *RequestGetBalancesFor
 	return req, nil
 }
 
+type RequestFeegrantAllowancesByGranter struct {
+	AccAddress sdk.AccAddress
+	Pagination *query.PageRequest
+
+	URI struct {
+		AccAddress string `uri:"acc_address"`
+	}
+	Query struct {
+		RPCAddress string `form:"rpc_address" binding:"required"`
+		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
+		Key        string `form:"key"`
+		Offset     uint64 `form:"offset"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		CountTotal bool   `form:"count_total"`
+		Reverse    bool   `form:"reverse"`
+	}
+}
+
+func NewRequestFeegrantAllowancesByGranter(c *gin.Context) (req *RequestFeegrantAllowancesByGranter, err error) {
+	req = &RequestFeegrantAllowancesByGranter{}
+	if err = c.ShouldBindUri(&req.URI); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindQuery(&req.Query); err != nil {
+		return nil, err
+	}
+
+	req.AccAddress, err = sdk.AccAddressFromBech32(req.URI.AccAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	var key []byte
+	if req.Query.Key != "" {
+		key, err = base64.StdEncoding.DecodeString(req.Query.Key)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.Pagination = &query.PageRequest{
+		Key:        key,
+		Offset:     req.Query.Offset,
+		Limit:      req.Query.Limit,
+		CountTotal: req.Query.CountTotal,
+		Reverse:    req.Query.Reverse,
+	}
+
+	return req, nil
+}
+
+type RequestFeegrantAllowances struct {
+	AccAddress sdk.AccAddress
+	Pagination *query.PageRequest
+
+	URI struct {
+		AccAddress string `uri:"acc_address"`
+	}
+	Query struct {
+		RPCAddress string `form:"rpc_address" binding:"required"`
+		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
+		Key        string `form:"key"`
+		Offset     uint64 `form:"offset"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		CountTotal bool   `form:"count_total"`
+		Reverse    bool   `form:"reverse"`
+	}
+}
+
+func NewRequestFeegrantAllowances(c *gin.Context) (req *RequestFeegrantAllowances, err error) {
+	req = &RequestFeegrantAllowances{}
+	if err = c.ShouldBindUri(&req.URI); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindQuery(&req.Query); err != nil {
+		return nil, err
+	}
+
+	req.AccAddress, err = sdk.AccAddressFromBech32(req.URI.AccAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	var key []byte
+	if req.Query.Key != "" {
+		key, err = base64.StdEncoding.DecodeString(req.Query.Key)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.Pagination = &query.PageRequest{
+		Key:        key,
+		Offset:     req.Query.Offset,
+		Limit:      req.Query.Limit,
+		CountTotal: req.Query.CountTotal,
+		Reverse:    req.Query.Reverse,
+	}
+
+	return req, nil
+}
+
 type RequestGetSessionsForAccount struct {
 	AccAddress sdk.AccAddress
 	Status     hubtypes.Status

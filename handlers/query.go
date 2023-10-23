@@ -59,6 +59,42 @@ func HandlerGetBalancesForAccount(ctx context.Context) gin.HandlerFunc {
 	}
 }
 
+func HandlerFeegrantAllowancesByGranter(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req, err := requests.NewRequestFeegrantAllowancesByGranter(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
+			return
+		}
+
+		result, err := ctx.QueryFeegrantAllowancesByGranter(req.Query.RPCAddress, req.AccAddress, req.Pagination)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(result))
+	}
+}
+
+func HandlerFeegrantAllowances(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req, err := requests.NewRequestFeegrantAllowances(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
+			return
+		}
+
+		result, err := ctx.QueryFeegrantAllowances(req.Query.RPCAddress, req.AccAddress, req.Pagination)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(result))
+	}
+}
+
 func HandlerGetSessionsForAccount(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req, err := requests.NewRequestGetSessionsForAccount(c)

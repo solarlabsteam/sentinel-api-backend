@@ -16,6 +16,9 @@ func RegisterQueryRoutes(router gin.IRouter, ctx context.Context) {
 	router.GET("/deposits", handlers.HandlerGetDeposits(ctx))
 	router.GET("/deposits/:acc_address", handlers.HandlerGetDeposit(ctx))
 
+	router.GET("/feegrants/:acc_address", handlers.HandlerFeegrantAllowancesByGranter(ctx))
+	router.GET("/feegrants/:acc_address/allowances", handlers.HandlerFeegrantAllowances(ctx))
+
 	router.GET("/nodes", handlers.HandlerGetNodes(ctx))
 	router.GET("/nodes/:node_address", handlers.HandlerGetNode(ctx))
 
