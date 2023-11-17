@@ -191,7 +191,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 						InsecureSkipVerify: true,
 					},
 				},
-				Timeout: 15 * time.Second,
+				Timeout: 30 * time.Second,
 			}
 		)
 
