@@ -5,8 +5,7 @@ WORKDIR /app
 ADD . .
 
 RUN go mod download
-RUN COMMIT=$(git log -1 --format='%H') && \
-    GOOS=linux GOARCH=amd64 go build -ldflags="-X github.com/cosmos/cosmos-sdk/version.Commit=${COMMIT}" -o /api ./
+RUN GOOS=linux GOARCH=amd64 go build -o /api ./
 
 EXPOSE 8080
 

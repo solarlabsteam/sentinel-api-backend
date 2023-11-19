@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -67,7 +68,7 @@ func HandlerTxFeegrantGrantAllowance(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -77,7 +78,23 @@ func HandlerTxFeegrantGrantAllowance(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
 
@@ -110,7 +127,7 @@ func HandlerTxBankSend(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -120,7 +137,23 @@ func HandlerTxBankSend(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
 
@@ -151,7 +184,7 @@ func HandlerTxPlanCreate(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -161,7 +194,23 @@ func HandlerTxPlanCreate(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
 
@@ -192,7 +241,7 @@ func HandlerTxPlanUpdateStatus(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -202,7 +251,23 @@ func HandlerTxPlanUpdateStatus(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
 
@@ -235,7 +300,7 @@ func HandlerTxPlanLinkNode(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -245,7 +310,23 @@ func HandlerTxPlanLinkNode(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
 
@@ -276,7 +357,7 @@ func HandlerTxPlanUnlinkNode(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -286,7 +367,23 @@ func HandlerTxPlanUnlinkNode(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
 
@@ -317,7 +414,7 @@ func HandlerTxNodeSubscribe(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -327,7 +424,23 @@ func HandlerTxNodeSubscribe(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
 
@@ -358,7 +471,7 @@ func HandlerTxPlanSubscribe(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -368,7 +481,23 @@ func HandlerTxPlanSubscribe(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
 
@@ -401,7 +530,7 @@ func HandlerTxSubscriptionAllocate(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -411,7 +540,23 @@ func HandlerTxSubscriptionAllocate(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
 
@@ -442,7 +587,7 @@ func HandlerTxSessionStart(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -452,7 +597,23 @@ func HandlerTxSessionStart(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
 
@@ -498,7 +659,7 @@ func HandlerTxSubscribe(ctx context.Context) gin.HandlerFunc {
 			messages = []sdk.Msg{&execMsg}
 		}
 
-		result, err := ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -508,6 +669,22 @@ func HandlerTxSubscribe(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, types.NewResponseResult(result))
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
 	}
 }
