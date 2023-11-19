@@ -11,7 +11,7 @@ import (
 
 type (
 	TxQuery struct {
-		BroadcastMode      string  `form:"broadcast_mode,default=block" binding:"oneof=async block sync"`
+		BroadcastMode      string  `form:"broadcast_mode,default=sync" binding:"oneof=async block sync"`
 		ChainID            string  `form:"chain_id,default=sentinelhub-2" binding:"required"`
 		CoinType           uint32  `form:"coin_type,default=118"`
 		Account            uint32  `form:"account"`
