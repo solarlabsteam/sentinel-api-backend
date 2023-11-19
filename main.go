@@ -50,6 +50,7 @@ func main() {
 			routes.RegisterKeyRoutes(router, ctx)
 			routes.RegisterQueryRoutes(router, ctx)
 			routes.RegisterTxRoutes(router, ctx)
+			routes.RegisterVersionRoutes(router, ctx)
 
 			return http.ListenAndServe(":"+os.Getenv("PORT"), engine)
 		},
