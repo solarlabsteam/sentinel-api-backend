@@ -19,6 +19,7 @@ type (
 		GasAdjustment      float64 `form:"gas_adjustment,default=1.25" binding:"gt=0"`
 		GasPrices          string  `form:"gas_prices,default=0.1udvpn"`
 		Gas                uint64  `form:"gas,default=200000" binding:"gt=0"`
+		MaxQueryTries      int64   `form:"max_query_tries,default=60" binding:"gt=0"`
 		RPCAddress         string  `form:"rpc_address,default=https://rpc.sentinel.co:443" binding:"required"`
 		SimulateAndExecute bool    `form:"simulate_and_execute,default=true"`
 	}

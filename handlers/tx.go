@@ -78,7 +78,7 @@ func HandlerTxFeegrantGrantAllowance(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return
@@ -137,7 +137,7 @@ func HandlerTxBankSend(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return
@@ -194,7 +194,7 @@ func HandlerTxPlanCreate(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return
@@ -251,7 +251,7 @@ func HandlerTxPlanUpdateStatus(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return
@@ -310,7 +310,7 @@ func HandlerTxPlanLinkNode(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return
@@ -367,7 +367,7 @@ func HandlerTxPlanUnlinkNode(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return
@@ -424,7 +424,7 @@ func HandlerTxNodeSubscribe(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return
@@ -481,7 +481,7 @@ func HandlerTxPlanSubscribe(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return
@@ -540,7 +540,7 @@ func HandlerTxSubscriptionAllocate(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return
@@ -597,7 +597,7 @@ func HandlerTxSessionStart(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return
@@ -669,7 +669,7 @@ func HandlerTxSubscribe(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
 			return

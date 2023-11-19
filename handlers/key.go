@@ -113,7 +113,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err.Error()))
 			return
