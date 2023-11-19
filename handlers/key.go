@@ -21,6 +21,7 @@ import (
 	"github.com/solarlabsteam/sentinel-api-backend/responses"
 	"github.com/solarlabsteam/sentinel-api-backend/types"
 	"github.com/solarlabsteam/sentinel-api-backend/utils"
+	eventutils "github.com/solarlabsteam/sentinel-api-backend/utils/event"
 )
 
 func fetchNodeInfo(remoteURL string) (map[string]interface{}, error) {
@@ -102,7 +103,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 			),
 		)
 
-		_, err = ctx.Tx(
+		txResp, err := ctx.Tx(
 			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
 			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
 			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
@@ -112,13 +113,25 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		rSession, err = ctx.QueryActiveSession(req.Query.RPCAddress, accAddress)
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, 60)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err.Error()))
 			return
 		}
-		if rSession == nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(6, "active session does not exist"))
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err.Error()))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err.Error()))
+			return
+		}
+
+		sessionID, err := eventutils.GetSessionIDFromABCIEvents(txRes.TxResult.Events)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(6, err.Error()))
 			return
 		}
 
@@ -160,7 +173,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		signature, _, err := kr.Sign(key.GetName(), sdk.Uint64ToBigEndian(rSession.ID))
+		signature, _, err := kr.Sign(key.GetName(), sdk.Uint64ToBigEndian(sessionID))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(10, err))
 			return
@@ -177,7 +190,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 			return
 		}
 
-		endpoint, err := url.JoinPath(rNode.RemoteURL, fmt.Sprintf("/accounts/%s/sessions/%d", accAddress, rSession.ID))
+		endpoint, err := url.JoinPath(rNode.RemoteURL, fmt.Sprintf("/accounts/%s/sessions/%d", accAddress, sessionID))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(12, err))
 			return
@@ -191,7 +204,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 						InsecureSkipVerify: true,
 					},
 				},
-				Timeout: 30 * time.Second,
+				Timeout: 15 * time.Second,
 			}
 		)
 

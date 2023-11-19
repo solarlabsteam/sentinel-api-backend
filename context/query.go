@@ -2,6 +2,9 @@ package context
 
 import (
 	"context"
+	"encoding/hex"
+	"strings"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -18,6 +21,7 @@ import (
 	subscriptiontypes "github.com/sentinel-official/hub/x/subscription/types"
 	"github.com/spf13/cobra"
 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
+	coretypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
 type Context struct {
@@ -26,6 +30,45 @@ type Context struct {
 
 func GetContextFromCmd(cmd *cobra.Command) Context {
 	return Context{Context: client.GetClientContextFromCmd(cmd)}
+}
+
+func (c Context) QueryTx(rpcAddress string, hash string) (result *coretypes.ResultTx, err error) {
+	c.Client, err = rpchttp.New(rpcAddress, "/websocket")
+	if err != nil {
+		return nil, err
+	}
+
+	buf, err := hex.DecodeString(hash)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err = c.Client.Tx(context.Background(), buf, false)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (c Context) QueryTxWithRetry(rpcAddress string, hash string, tries int64) (result *coretypes.ResultTx, err error) {
+	for ; tries > 0; tries-- {
+		result, err = c.QueryTx(rpcAddress, hash)
+		if err != nil {
+			return nil, err
+		}
+		if result != nil {
+			break
+		}
+
+		time.Sleep(1 * time.Second)
+	}
+
+	return result, nil
 }
 
 func (c Context) QueryAccount(rpcAddress string, accAddr sdk.AccAddress) (result authtypes.AccountI, err error) {
