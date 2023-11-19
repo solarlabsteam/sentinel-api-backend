@@ -50,7 +50,7 @@ type RequestGetBalancesForAccount struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -101,7 +101,7 @@ type RequestFeegrantAllowancesByGranter struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -152,7 +152,7 @@ type RequestFeegrantAllowances struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -204,7 +204,7 @@ type RequestGetSessionsForAccount struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -260,7 +260,7 @@ type RequestGetSubscriptionsForAccount struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -310,7 +310,7 @@ type RequestGetDeposits struct {
 		RPCAddress string `form:"rpc_address" binding:"required"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -378,7 +378,7 @@ type RequestGetNodes struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -451,7 +451,7 @@ type RequestGetPlans struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -517,7 +517,7 @@ type RequestGetProviders struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -593,7 +593,7 @@ type RequestGetNodesForPlan struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -645,7 +645,7 @@ type RequestGetPlansForProvider struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -697,7 +697,7 @@ type RequestGetSessions struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -763,7 +763,7 @@ type RequestGetSubscriptions struct {
 		Status     string `form:"status,default=Active" binding:"oneof=Active InactivePending Inactive"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
@@ -830,7 +830,7 @@ type RequestGetAllocationsForSubscription struct {
 		RPCAddress string `form:"rpc_address" binding:"required"`
 		Key        string `form:"key"`
 		Offset     uint64 `form:"offset"`
-		Limit      uint64 `form:"limit,default=25" binding:"gt=0,lte=100"`
+		Limit      uint64 `form:"limit,default=25" binding:"gt=0"`
 		CountTotal bool   `form:"count_total"`
 		Reverse    bool   `form:"reverse"`
 	}
