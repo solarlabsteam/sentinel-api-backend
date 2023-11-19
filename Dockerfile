@@ -2,7 +2,7 @@ FROM golang:1.21
 
 WORKDIR /app
 
-COPY . .
+ADD . .
 
 RUN go mod download
 RUN COMMIT=$(git log -1 --format='%H') && \
