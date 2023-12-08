@@ -198,7 +198,7 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 
 		var (
 			body   types.Response
-			client = http.Client{
+			client = &http.Client{
 				Transport: &http.Transport{
 					TLSClientConfig: &tls.Config{
 						InsecureSkipVerify: true,
@@ -220,12 +220,13 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 			}
 		}()
 
-		if err = json.NewDecoder(resp.Body).Decode(&body); err != nil {
+		if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(14, err))
 			return
 		}
 		if body.Error != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(15, body.Error))
+			err := fmt.Errorf("node responded with code %d and message %s", body.Error.Code, body.Error.Message)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(15, err))
 			return
 		}
 
