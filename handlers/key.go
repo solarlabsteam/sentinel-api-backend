@@ -115,23 +115,23 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(5, err))
 			return
 		}
 
 		sessionID, err := eventutils.GetSessionIDFromABCIEvents(txRes.TxResult.Events)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(6, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(6, err))
 			return
 		}
 
@@ -169,7 +169,8 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 
 			clientKey = base64.StdEncoding.EncodeToString(append([]byte{0x01}, uid...))
 		} else {
-			c.JSON(http.StatusBadRequest, types.NewResponseError(9, "unknown node type"))
+			err := fmt.Errorf("unknown node type %f", nodeType)
+			c.JSON(http.StatusBadRequest, types.NewResponseError(9, err))
 			return
 		}
 

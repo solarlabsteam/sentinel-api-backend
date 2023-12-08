@@ -80,17 +80,17 @@ func HandlerTxFeegrantGrantAllowance(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
@@ -139,17 +139,17 @@ func HandlerTxBankSend(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
@@ -196,17 +196,17 @@ func HandlerTxPlanCreate(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
@@ -253,17 +253,17 @@ func HandlerTxPlanUpdateStatus(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
@@ -312,17 +312,17 @@ func HandlerTxPlanLinkNode(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
@@ -369,17 +369,17 @@ func HandlerTxPlanUnlinkNode(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
@@ -426,17 +426,17 @@ func HandlerTxNodeSubscribe(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
@@ -483,17 +483,17 @@ func HandlerTxPlanSubscribe(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
@@ -542,17 +542,17 @@ func HandlerTxSubscriptionAllocate(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
@@ -599,17 +599,17 @@ func HandlerTxSessionStart(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 
@@ -671,17 +671,17 @@ func HandlerTxSubscribe(ctx context.Context) gin.HandlerFunc {
 
 		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if txRes == nil {
 			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 		if !txRes.TxResult.IsOK() {
 			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
-			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err.Error()))
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
 			return
 		}
 

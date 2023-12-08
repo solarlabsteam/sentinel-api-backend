@@ -26,15 +26,8 @@ func NewResponse(err *Error, res interface{}) *Response {
 	}
 }
 
-func NewResponseError(code int, v interface{}) *Response {
-	message := ""
-	if m, ok := v.(string); ok {
-		message = m
-	} else if m, ok := v.(error); ok {
-		message = m.Error()
-	}
-
-	return NewResponse(NewError(code, message), nil)
+func NewResponseError(code int, v error) *Response {
+	return NewResponse(NewError(code, v.Error()), nil)
 }
 
 func NewResponseResult(v interface{}) *Response {
