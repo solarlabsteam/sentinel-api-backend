@@ -209,8 +209,11 @@ func HandlerAddSessionKey(ctx context.Context) gin.HandlerFunc {
 			}
 		)
 
+		tStart := time.Now()
+
 		resp, err := client.Post(endpoint, jsonrpc.ContentType, bytes.NewBuffer(nReq))
 		if err != nil {
+			err := fmt.Errorf("error %s; time took %s", err, time.Since(tStart))
 			c.JSON(http.StatusInternalServerError, types.NewResponseError(13, err))
 			return
 		}
