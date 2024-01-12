@@ -679,3 +679,46 @@ func NewRequestTxSubscribe(c *gin.Context) (req *RequestTxSubscribe, err error) 
 
 	return req, err
 }
+
+type RequestTxSubscriptionCancel struct {
+	AuthzGranter sdk.AccAddress
+	FeeGranter   sdk.AccAddress
+	GasPrices    sdk.DecCoins
+
+	Query TxQuery
+	Body  struct {
+		TxBody
+		IDs []uint64 `json:"ids"`
+	}
+}
+
+func NewRequestTxSubscriptionCancel(c *gin.Context) (req *RequestTxSubscriptionCancel, err error) {
+	req = &RequestTxSubscriptionCancel{}
+	if err = c.ShouldBindQuery(&req.Query); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindJSON(&req.Body); err != nil {
+		return nil, err
+	}
+
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if req.Body.FeeGranter != "" {
+		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.GasPrices, err = sdk.ParseDecCoins(req.Query.GasPrices)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, err
+}
