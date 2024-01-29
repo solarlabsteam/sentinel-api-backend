@@ -21,6 +21,77 @@ import (
 	"github.com/solarlabsteam/sentinel-api-backend/utils"
 )
 
+func HandlerTxAuthzGrant(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req, err := requests.NewRequestTxAuthzGrant(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, types.NewResponseError(1, err))
+			return
+		}
+
+		kr, key, err := utils.NewInMemoryKey(req.Body.Mnemonic, req.Query.CoinType, req.Query.Account, req.Query.Index, req.Body.BIP39Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(2, err))
+			return
+		}
+
+		fromAddr := key.GetAddress()
+		if !req.AuthzGranter.Empty() {
+			fromAddr = req.AuthzGranter
+		}
+
+		var (
+			messages     []sdk.Msg
+			genericAuthz = &authz.GenericAuthorization{
+				Msg: req.Body.MsgType,
+			}
+		)
+
+		for i := 0; i < len(req.AccAddresses); i++ {
+			message, err := authz.NewMsgGrant(fromAddr, req.AccAddresses[i], genericAuthz, req.Body.Expiration)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, types.NewResponseError(3, err))
+				return
+			}
+
+			messages = append(messages, message)
+		}
+
+		if !req.AuthzGranter.Empty() {
+			execMsg := authz.NewMsgExec(key.GetAddress(), messages)
+			messages = []sdk.Msg{&execMsg}
+		}
+
+		txResp, err := ctx.Tx(
+			kr, key.GetName(), req.Query.Gas, req.Query.GasAdjustment, req.Query.GasPrices,
+			req.Body.Fees, req.FeeGranter, req.Body.Memo, req.Body.SignMode, req.Query.ChainID, req.Query.RPCAddress,
+			req.Body.TimeoutHeight, req.Query.SimulateAndExecute, req.Query.BroadcastMode, messages...,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(3, err))
+			return
+		}
+
+		txRes, err := ctx.QueryTxWithRetry(req.Query.RPCAddress, txResp.TxHash, req.Query.MaxQueryTries)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
+			return
+		}
+		if txRes == nil {
+			err := fmt.Errorf("query result is nil for the transaction %s", txResp.TxHash)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
+			return
+		}
+		if !txRes.TxResult.IsOK() {
+			err := fmt.Errorf("transaction %s failed with the code %d", txResp.TxHash, txRes.TxResult.Code)
+			c.JSON(http.StatusInternalServerError, types.NewResponseError(4, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, types.NewResponseResult(txRes))
+	}
+}
+
 func HandlerTxFeegrantGrantAllowance(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req, err := requests.NewRequestTxFeegrantGrantAllowance(c)

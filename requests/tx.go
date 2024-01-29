@@ -35,6 +35,61 @@ type (
 	}
 )
 
+type RequestTxAuthzGrant struct {
+	AuthzGranter sdk.AccAddress
+	FeeGranter   sdk.AccAddress
+	GasPrices    sdk.DecCoins
+	AccAddresses []sdk.AccAddress
+
+	Query TxQuery
+	Body  struct {
+		TxBody
+		AccAddresses []string  `json:"acc_addresses" binding:"required"`
+		MsgType      string    `json:"msg_type" binding:"required"`
+		Expiration   time.Time `json:"expiration" binding:"required"`
+	}
+}
+
+func NewRequestTxAuthzGrant(c *gin.Context) (req *RequestTxAuthzGrant, err error) {
+	req = &RequestTxAuthzGrant{}
+	if err = c.ShouldBindQuery(&req.Query); err != nil {
+		return nil, err
+	}
+	if err = c.ShouldBindJSON(&req.Body); err != nil {
+		return nil, err
+	}
+
+	if req.Body.AuthzGranter != "" {
+		req.AuthzGranter, err = sdk.AccAddressFromBech32(req.Body.AuthzGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if req.Body.FeeGranter != "" {
+		req.FeeGranter, err = sdk.AccAddressFromBech32(req.Body.FeeGranter)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.GasPrices, err = sdk.ParseDecCoins(req.Query.GasPrices)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, s := range req.Body.AccAddresses {
+		v, err := sdk.AccAddressFromBech32(s)
+		if err != nil {
+			return nil, err
+		}
+
+		req.AccAddresses = append(req.AccAddresses, v)
+	}
+
+	return req, err
+}
+
 type RequestTxFeegrantGrantAllowance struct {
 	AuthzGranter sdk.AccAddress
 	FeeGranter   sdk.AccAddress
