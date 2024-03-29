@@ -91,18 +91,22 @@ func NewRequestTxAuthzGrant(c *gin.Context) (req *RequestTxAuthzGrant, err error
 }
 
 type RequestTxFeegrantGrantAllowance struct {
-	AuthzGranter sdk.AccAddress
-	FeeGranter   sdk.AccAddress
-	GasPrices    sdk.DecCoins
-	AccAddresses []sdk.AccAddress
-	SpendLimit   sdk.Coins
+	AuthzGranter     sdk.AccAddress
+	FeeGranter       sdk.AccAddress
+	GasPrices        sdk.DecCoins
+	AccAddresses     []sdk.AccAddress
+	PeriodSpendLimit sdk.Coins
+	SpendLimit       sdk.Coins
 
 	Query TxQuery
 	Body  struct {
 		TxBody
-		AccAddresses []string  `json:"acc_addresses" binding:"required"`
-		SpendLimit   string    `json:"spend_limit"`
-		Expiration   time.Time `json:"expiration"`
+		AccAddresses     []string      `json:"acc_addresses" binding:"required"`
+		AllowedMsgs      []string      `json:"allowed_msgs"`
+		Expiration       time.Time     `json:"expiration"`
+		PeriodSpendLimit string        `json:"period_spend_limit"`
+		Period           time.Duration `json:"period"`
+		SpendLimit       string        `json:"spend_limit"`
 	}
 }
 
@@ -143,11 +147,23 @@ func NewRequestTxFeegrantGrantAllowance(c *gin.Context) (req *RequestTxFeegrantG
 		req.AccAddresses = append(req.AccAddresses, v)
 	}
 
+	if req.Body.PeriodSpendLimit != "" {
+		req.PeriodSpendLimit, err = sdk.ParseCoinsNormalized(req.Body.PeriodSpendLimit)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if req.Body.SpendLimit != "" {
 		req.SpendLimit, err = sdk.ParseCoinsNormalized(req.Body.SpendLimit)
 		if err != nil {
 			return nil, err
 		}
+	}
+	if req.Body.Period < 0 {
+		return nil, fmt.Errorf("period cannot be negative")
+	}
+	if req.Body.Period > 0 && req.Body.PeriodSpendLimit == "" {
+		return nil, fmt.Errorf("period_spend_limit cannot be empty")
 	}
 
 	return req, err

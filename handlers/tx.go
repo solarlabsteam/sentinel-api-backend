@@ -118,14 +118,42 @@ func HandlerTxFeegrantGrantAllowance(ctx context.Context) gin.HandlerFunc {
 
 		var (
 			messages       []sdk.Msg
-			basicAllowance = &feegrant.BasicAllowance{
+			basicAllowance = feegrant.BasicAllowance{
 				SpendLimit: req.SpendLimit,
 				Expiration: expiration,
 			}
+			grant feegrant.FeeAllowanceI = &basicAllowance
 		)
 
+		if req.Body.Period > 0 {
+			periodicAllowance := feegrant.PeriodicAllowance{
+				Basic:            basicAllowance,
+				Period:           req.Body.Period,
+				PeriodSpendLimit: req.PeriodSpendLimit,
+				PeriodCanSpend:   req.PeriodSpendLimit,
+				PeriodReset:      time.Now().Add(req.Body.Period),
+			}
+
+			if expiration != nil && expiration.Sub(periodicAllowance.PeriodReset) < 0 {
+				err := fmt.Errorf("period_reset cannot be grater than expiration")
+				c.JSON(http.StatusBadRequest, types.NewResponseError(3, err))
+				return
+			}
+
+			grant = &periodicAllowance
+		}
+		if req.Body.AllowedMsgs != nil {
+			allowedMsgAllowance, err := feegrant.NewAllowedMsgAllowance(grant, req.Body.AllowedMsgs)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, types.NewResponseError(3, err))
+				return
+			}
+
+			grant = allowedMsgAllowance
+		}
+
 		for i := 0; i < len(req.AccAddresses); i++ {
-			message, err := feegrant.NewMsgGrantAllowance(basicAllowance, fromAddr, req.AccAddresses[i])
+			message, err := feegrant.NewMsgGrantAllowance(grant, fromAddr, req.AccAddresses[i])
 			if err != nil {
 				c.JSON(http.StatusBadRequest, types.NewResponseError(3, err))
 				return
